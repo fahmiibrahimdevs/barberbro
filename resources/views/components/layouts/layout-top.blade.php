@@ -8,8 +8,9 @@
 
     <!-- General CSS Files -->
     <link rel="stylesheet" href="{{ asset('/assets/stisla/css/bootstrap.min.css') }}" />
-    <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.2.0/css/all.css" />
-    <link rel="stylesheet" href="https://static.fontawesome.com/css/fontawesome-app.css" />
+    {{-- <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.2.0/css/all.css" />
+    <link rel="stylesheet" href="https://static.fontawesome.com/css/fontawesome-app.css" /> --}}
+    <link rel="stylesheet" href="{{ asset('assets/fontawesome-pro/css/all.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/midragon/css/custom.css') }}">
     <link rel="icon" href="{{ asset('/assets/MIDRAGON.png') }}">
 
@@ -26,7 +27,7 @@
         <div class="main-wrapper container">
             <div class="navbar-bg "></div>
             <nav class="navbar navbar-expand-lg main-navbar">
-                <a href="{{ url('dashboard') }}" class="navbar-brand sidebar-gone-hide">LIVEWIRE 3</a>
+                <a href="{{ url('dashboard') }}" class="navbar-brand sidebar-gone-hide">BARBERBRO</a>
                 <div class="navbar-nav">
                     <a href="#" class="nav-link sidebar-gone-show" data-toggle="sidebar">
                         <i class="fas fa-bars"></i>
@@ -36,8 +37,7 @@
                 </form>
                 <ul class="navbar-nav navbar-right">
                     <li class="dropdown">
-                        <a href="#" data-toggle="dropdown"
-                            class="nav-link dropdown-toggle nav-link-lg nav-link-user">
+                        <a href="#" data-toggle="dropdown" class="nav-link dropdown-toggle nav-link-lg nav-link-user">
                             <div class="d-sm-none d-lg-inline-block">Hi, {{ Auth::user()->name }}</div>
                         </a>
                         <div class="dropdown-menu dropdown-menu-right">
@@ -48,8 +48,7 @@
                             <div class="dropdown-divider"></div>
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
-                                <a href="{{ route('logout') }}" class="dropdown-item text-danger has-icon"
-                                    onclick="event.preventDefault();
+                                <a href="{{ route('logout') }}" class="dropdown-item text-danger has-icon" onclick="event.preventDefault();
                                 this.closest('form').submit();">
                                     <i class="far fa-sign-out-alt"></i> Logout
                                 </a>
@@ -68,20 +67,101 @@
                             </a>
                         </li>
                         @if (Auth::user()->hasRole('admin'))
-                            <li
-                                class="nav-item dropdown {{ request()->is('example') || request()->is('control-user') ? 'active' : '' }}">
-                                <a href="#" data-toggle="dropdown" class="nav-link has-dropdown">
-                                    <i class="fas fa-chalkboard"></i><span>Master Data</span>
-                                </a>
-                                <ul class="dropdown-menu">
-                                    <li class="nav-item {{ request()->is('example') ? 'active' : '' }}">
-                                        <a href="/example" class="nav-link">Example</a>
-                                    </li>
-                                    <li class="nav-item {{ request()->is('control-user') ? 'active' : '' }}">
-                                        <a href="/control-user" class="nav-link">Control User</a>
-                                    </li>
-                                </ul>
-                            </li>
+                        <li class="nav-item dropdown {{ 
+                            request()->is('master-data/produk/kategori') || request()->is('master-data/produk') || request()->is('master-data/pelanggan') || request()->is('master-data/karyawan') || request()->is('master-data/pengeluaran/kategori') || request()->is('master-data/pengeluaran') || request()->is('master-data/slip-gaji') 
+                            ? 'active' : '' }}">
+                            <a href="#" data-toggle="dropdown" class="nav-link has-dropdown">
+                                <i class="fas fa-chalkboard"></i><span>Master Data</span>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li class="nav-item {{ request()->is('master-data/produk/kategori') ? 'active' : '' }}">
+                                    <a href="/master-data/produk/kategori" class="nav-link">Kategori Produk</a>
+                                </li>
+                                <li class="nav-item {{ request()->is('master-data/produk') ? 'active' : '' }}">
+                                    <a href="/master-data/produk" class="nav-link">Produk</a>
+                                </li>
+                                <li class="nav-item {{ request()->is('master-data/pelanggan') ? 'active' : '' }}">
+                                    <a href="/master-data/pelanggan" class="nav-link">Pelanggan</a>
+                                </li>
+                                <li class="nav-item {{ request()->is('master-data/karyawan') ? 'active' : '' }}">
+                                    <a href="/master-data/karyawan" class="nav-link">Karyawan</a>
+                                </li>
+                                <li
+                                    class="nav-item {{ request()->is('master-data/pengeluaran/kategori') ? 'active' : '' }}">
+                                    <a href="/master-data/pengeluaran/kategori" class="nav-link">Kategori
+                                        Pengeluaran</a>
+                                </li>
+                                <li class="nav-item {{ request()->is('master-data/pengeluaran') ? 'active' : '' }}">
+                                    <a href="/master-data/pengeluaran" class="nav-link">Pengeluaran</a>
+                                </li>
+                                <li class="nav-item {{ request()->is('master-data/slip-gaji') ? 'active' : '' }}">
+                                    <a href="/master-data/slip-gaji" class="nav-link">Slip Gaji</a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="nav-item dropdown {{ 
+                            request()->is('transaksi/metode-pembayaran') || request()->is('transaksi') 
+                            ? 'active' : '' }}">
+                            <a href="#" data-toggle="dropdown" class="nav-link has-dropdown">
+                                <i class="far fa-cash-register"></i><span>Transaksi</span>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li class="nav-item {{ request()->is('transaksi/metode-pembayaran') ? 'active' : '' }}">
+                                    <a href="/transaksi/metode-pembayaran" class="nav-link">Metode Pembayaran</a>
+                                </li>
+                                <li class="nav-item {{ request()->is('transaksi') ? 'active' : '' }}">
+                                    <a href="/transaksi" class="nav-link">Transaksi</a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="nav-item dropdown {{ 
+                            request()->is('laporan/transaksi') || request()->is('laporan/pembayaran-non-tunai') ||  request()->is('laporan/transaksi-batal') || request()->is('laporan/komisi-karyawan') || request()->is('laporan/pengeluaran')
+                            ? 'active' : '' }}">
+                            <a href="#" data-toggle="dropdown" class="nav-link has-dropdown">
+                                <i class="far fa-files"></i><span>Laporan</span>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li class="nav-item {{ request()->is('laporan/transaksi') ? 'active' : '' }}">
+                                    <a href="/laporan/transaksi" class="nav-link">Laporan Transaksi</a>
+                                </li>
+                                <li
+                                    class="nav-item {{ request()->is('laporan/pembayaran-non-tunai') ? 'active' : '' }}">
+                                    <a href="/laporan/pembayaran-non-tunai" class="nav-link">Laporan Pembayaran Non
+                                        Tunai</a>
+                                </li>
+                                <li class="nav-item {{ request()->is('laporan/transaksi-batal') ? 'active' : '' }}">
+                                    <a href="/laporan/transaksi-batal" class="nav-link">Laporan Transaksi Batal</a>
+                                </li>
+                                <li class="nav-item {{ request()->is('laporan/komisi-karyawan') ? 'active' : '' }}">
+                                    <a href="/laporan/komisi-karyawan" class="nav-link">Laporan Komisi Karyawan</a>
+                                </li>
+                                <li class="nav-item {{ request()->is('laporan/pengeluaran') ? 'active' : '' }}">
+                                    <a href="/laporan/pengeluaran" class="nav-link">Laporan Pengeluaran</a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="nav-item dropdown {{ 
+                            request()->is('pengaturan/profile-usaha') || request()->is('pengaturan/reset-no-transaksi') || request()->is('pengaturan/backup-restore') || request()->is('pengaturan/control-user')
+                            ? 'active' : '' }}">
+                            <a href="#" data-toggle="dropdown" class="nav-link has-dropdown">
+                                <i class="far fa-cogs"></i><span>Pengaturan</span>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li class="nav-item {{ request()->is('pengaturan/profile-usaha') ? 'active' : '' }}">
+                                    <a href="/pengaturan/profile-usaha" class="nav-link">Profile Usaha</a>
+                                </li>
+                                <li
+                                    class="nav-item {{ request()->is('pengaturan/reset-no-transaksi') ? 'active' : '' }}">
+                                    <a href="/pengaturan/reset-no-transaksi" class="nav-link">Reset No. Transaksi</a>
+                                </li>
+                                <li class="nav-item {{ request()->is('pengaturan/backup-restore') ? 'active' : '' }}">
+                                    <a href="/pengaturan/backup-restore" class="nav-link">Backup & Restore</a>
+                                </li>
+                                <li class="nav-item {{ request()->is('pengaturan/control-user') ? 'active' : '' }}">
+                                    <a href="/pengaturan/control-user" class="nav-link">Control User</a>
+                                </li>
+                            </ul>
+                        </li>
                         @endif
                     </ul>
                 </div>
@@ -93,11 +173,11 @@
             </div>
             <footer class="main-footer">
                 <div class="footer-left">
-                    Copyright &copy; 2024 <div class="bullet"></div> Created By <a
+                    Copyright &copy; 2025 <div class="bullet"></div> Created By <a
                         href="http://fahmiibrahimdev.tech/">Fahmi Ibrahim</a>
                 </div>
                 <div class="footer-right">
-                    1.1.6
+                    1.0.0
                 </div>
             </footer>
         </div>
@@ -141,9 +221,10 @@
                 }
             })
         })
-        window.onbeforeunload = function() {
+        window.onbeforeunload = function () {
             window.scrollTo(5, 75);
         };
+
     </script>
 
     <!-- Template JS File -->
