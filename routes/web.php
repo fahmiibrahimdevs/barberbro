@@ -6,6 +6,10 @@ use App\Livewire\Dashboard\Dashboard;
 use Illuminate\Support\Facades\Route;
 use App\Livewire\Control\User as ControlUser;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Livewire\DataPendukung\CabangLokasi;
+use App\Livewire\DataPendukung\KategoriPembayaran;
+use App\Livewire\DataPendukung\KategoriPengeluaran;
+use App\Livewire\DataPendukung\KategoriProduk;
 
 Route::get('/', [AuthenticatedSessionController::class, 'create'])
     ->name('login');
@@ -17,7 +21,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', Profile::class);
 });
 
-Route::group(['middleware' => ['auth', 'role:admin']], function () {
+Route::group(['middleware' => ['auth', 'role:direktur']], function () {
+    Route::get('/cabang-lokasi', CabangLokasi::class);
+    Route::get('/kategori/produk', KategoriProduk::class);
+    Route::get('/kategori/pengeluaran', KategoriPengeluaran::class);
+    Route::get('/kategori/pembayaran', KategoriPembayaran::class);
     Route::get('/example', Example::class);
     Route::get('/control-user', ControlUser::class);
 });

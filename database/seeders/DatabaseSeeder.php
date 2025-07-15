@@ -14,7 +14,12 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call([
-            LaratrustSeeder::class
+            LaratrustSeeder::class,
+            AdministratorSeeder::class,
+            CabangLokasiSeeder::class,
+            KategoriProdukSeeder::class,
+            KategoriPengeluaranSeeder::class,
+            KategoriPembayaranSeeder::class
         ]);
     }
 }

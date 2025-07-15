@@ -12,11 +12,17 @@ return [
     'truncate_tables' => true,
 
     'roles_structure' => [
+        'direktur' => [
+            'users' => 'c,r,u,d',
+        ],
         'admin' => [
             'users' => 'c,r,u,d',
         ],
-        'user' => [
-            'module_1_name' => 'c,r,u,d',
+        'kasir' => [
+            'users' => 'c,r,u,d',
+        ],
+        'capster' => [
+            'users' => 'c,r,u,d',
         ],
     ],
 

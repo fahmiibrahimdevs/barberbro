@@ -15,6 +15,13 @@
     <link rel="icon" href="{{ asset('/assets/MIDRAGON.png') }}">
 
     @stack('general-css')
+    <style>
+        .no-scrollbar {
+            -ms-overflow-style: none !important;
+            scrollbar-width: none !important;
+        }
+
+    </style>
 
     <!-- Template CSS -->
     <link rel="stylesheet" href="{{ asset('/assets/stisla/css/style.css') }}">
@@ -66,17 +73,27 @@
                                 <i class="far fa-home"></i><span>Dashboard</span>
                             </a>
                         </li>
-                        @if (Auth::user()->hasRole('admin'))
+                        @if (Auth::user()->hasRole('direktur'))
                         <li class="nav-item dropdown {{ 
-                            request()->is('master-data/produk/kategori') || request()->is('master-data/produk') || request()->is('master-data/pelanggan') || request()->is('master-data/karyawan') || request()->is('master-data/pengeluaran/kategori') || request()->is('master-data/pengeluaran') || request()->is('master-data/slip-gaji') 
+                            request()->is('kategori/produk') || request()->is('kategori/pengeluaran') || request()->is('kategori/pembayaran') || request()->is('cabang-lokasi') || request()->is('master-data/produk') || request()->is('master-data/pelanggan') || request()->is('master-data/karyawan') || request()->is('master-data/pengeluaran') || request()->is('master-data/slip-gaji') 
                             ? 'active' : '' }}">
-                            <a href="#" data-toggle="dropdown" class="nav-link has-dropdown">
-                                <i class="fas fa-chalkboard"></i><span>Master Data</span>
-                            </a>
+                            <a href="#" data-toggle="dropdown" class="nav-link has-dropdown"><i
+                                    class="far fa-clone"></i><span>Master Data</span></a>
                             <ul class="dropdown-menu">
-                                <li class="nav-item {{ request()->is('master-data/produk/kategori') ? 'active' : '' }}">
-                                    <a href="/master-data/produk/kategori" class="nav-link">Kategori Produk</a>
+                                <div class="dropdown-title">DATA PENDUKUNG</div>
+                                <li class="nav-item {{ request()->is('cabang-lokasi') ? 'active' : '' }}">
+                                    <a href="/cabang-lokasi" class="nav-link">Cabang Lokasi</a>
                                 </li>
+                                <li class="nav-item {{ request()->is('kategori/produk') ? 'active' : '' }}">
+                                    <a href="/kategori/produk" class="nav-link">Kategori Produk</a>
+                                </li>
+                                <li class="nav-item {{ request()->is('kategori/pengeluaran') ? 'active' : '' }}">
+                                    <a href="/kategori/pengeluaran" class="nav-link">Kategori Pengeluaran</a>
+                                </li>
+                                <li class="nav-item {{ request()->is('kategori/pembayaran') ? 'active' : '' }}">
+                                    <a href="/kategori/pembayaran" class="nav-link">Kategori Pembayaran</a>
+                                </li>
+                                <div class="dropdown-title">DATA DATA</div>
                                 <li class="nav-item {{ request()->is('master-data/produk') ? 'active' : '' }}">
                                     <a href="/master-data/produk" class="nav-link">Produk</a>
                                 </li>
@@ -85,11 +102,6 @@
                                 </li>
                                 <li class="nav-item {{ request()->is('master-data/karyawan') ? 'active' : '' }}">
                                     <a href="/master-data/karyawan" class="nav-link">Karyawan</a>
-                                </li>
-                                <li
-                                    class="nav-item {{ request()->is('master-data/pengeluaran/kategori') ? 'active' : '' }}">
-                                    <a href="/master-data/pengeluaran/kategori" class="nav-link">Kategori
-                                        Pengeluaran</a>
                                 </li>
                                 <li class="nav-item {{ request()->is('master-data/pengeluaran') ? 'active' : '' }}">
                                     <a href="/master-data/pengeluaran" class="nav-link">Pengeluaran</a>
@@ -100,17 +112,41 @@
                             </ul>
                         </li>
                         <li class="nav-item dropdown {{ 
-                            request()->is('transaksi/metode-pembayaran') || request()->is('transaksi') 
+                            request()->is('persediaan/stok-masuk') || request()->is('persediaan/stok-keluar') || request()->is('persediaan/saldo-awal-stok') || request()->is('persediaan/stok-opname') || request()->is('persediaan/kartu-stok')
+                            ? 'active' : '' }}">
+                            <a href="#" data-toggle="dropdown" class="nav-link has-dropdown">
+                                <i class="far fa-inventory"></i><span>Persediaan</span>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li class="nav-item {{ request()->is('persediaan/stok-masuk') ? 'active' : '' }}">
+                                    <a href="/persediaan/stok-masuk" class="nav-link">Stok Masuk</a>
+                                </li>
+                                <li class="nav-item {{ request()->is('persediaan/stok-keluar') ? 'active' : '' }}">
+                                    <a href="/persediaan/stok-keluar" class="nav-link">Stok Keluar</a>
+                                </li>
+                                <li class="nav-item {{ request()->is('persediaan/saldo-awal-stok') ? 'active' : '' }}">
+                                    <a href="/persediaan/saldo-awal-stok" class="nav-link">Saldo Awal Stok</a>
+                                </li>
+                                <li class="nav-item {{ request()->is('persediaan/stok-opname') ? 'active' : '' }}">
+                                    <a href="/persediaan/stok-opname" class="nav-link">Stok Opname</a>
+                                </li>
+                                <li class="nav-item {{ request()->is('persediaan/kartu-stok') ? 'active' : '' }}">
+                                    <a href="/persediaan/kartu-stok" class="nav-link">Kartu Stok</a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="nav-item dropdown {{ 
+                            request()->is('transaksi/jadwal-booking') || request()->is('transaksi') 
                             ? 'active' : '' }}">
                             <a href="#" data-toggle="dropdown" class="nav-link has-dropdown">
                                 <i class="far fa-cash-register"></i><span>Transaksi</span>
                             </a>
                             <ul class="dropdown-menu">
-                                <li class="nav-item {{ request()->is('transaksi/metode-pembayaran') ? 'active' : '' }}">
-                                    <a href="/transaksi/metode-pembayaran" class="nav-link">Metode Pembayaran</a>
-                                </li>
                                 <li class="nav-item {{ request()->is('transaksi') ? 'active' : '' }}">
                                     <a href="/transaksi" class="nav-link">Transaksi</a>
+                                </li>
+                                <li class="nav-item {{ request()->is('transaksi/jadwal-booking') ? 'active' : '' }}">
+                                    <a href="/transaksi/jadwal-booking" class="nav-link">Jadwal Booking</a>
                                 </li>
                             </ul>
                         </li>
