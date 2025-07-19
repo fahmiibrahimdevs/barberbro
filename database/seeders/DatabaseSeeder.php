@@ -19,7 +19,8 @@ class DatabaseSeeder extends Seeder
             CabangLokasiSeeder::class,
             KategoriProdukSeeder::class,
             KategoriPengeluaranSeeder::class,
-            KategoriPembayaranSeeder::class
+            KategoriPembayaranSeeder::class,
+            KategoriSatuanSeeder::class
         ]);
     }
 }

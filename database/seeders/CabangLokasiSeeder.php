@@ -20,6 +20,18 @@ class CabangLokasiSeeder extends Seeder
                 'status'              => 'aktif',
                 'no_telp'             => '085216003456',
             ],
+            [
+                'nama_cabang'         => 'CheckPoint Barbershop II',
+                'alamat'              => 'Jl. Cipinang Muara III, Cipinang Muara, Kec. Jatinegara, DKI Jakarta 13420',
+                'status'              => 'aktif',
+                'no_telp'             => '089601922906',
+            ],
+            [
+                'nama_cabang'         => 'CheckPoint Barbershop III',
+                'alamat'              => 'Universitas Indonesia, Jl. Prof. DR. G.A. Siwabessy, Kukusan, Kecamatan Beji, Kota Depok, Jawa Barat 16425',
+                'status'              => 'aktif',
+                'no_telp'             => '085691253593',
+            ],
         ];
 
         CabangLokasi::insert($data);

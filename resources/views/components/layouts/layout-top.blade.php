@@ -31,6 +31,7 @@
 
 <body class="layout-3" style="font-family: 'Inter', sans-serif">
     <div id="app">
+        {{-- tw-bg-[#778e97] --}}
         <div class="main-wrapper container">
             <div class="navbar-bg "></div>
             <nav class="navbar navbar-expand-lg main-navbar">
@@ -75,7 +76,7 @@
                         </li>
                         @if (Auth::user()->hasRole('direktur'))
                         <li class="nav-item dropdown {{ 
-                            request()->is('kategori/produk') || request()->is('kategori/pengeluaran') || request()->is('kategori/pembayaran') || request()->is('cabang-lokasi') || request()->is('master-data/produk') || request()->is('master-data/pelanggan') || request()->is('master-data/karyawan') || request()->is('master-data/pengeluaran') || request()->is('master-data/slip-gaji') 
+                            request()->is('kategori/produk') || request()->is('kategori/pengeluaran') || request()->is('kategori/pembayaran') || request()->is('kategori/satuan') || request()->is('cabang-lokasi') || request()->is('master-data/produk') || request()->is('master-data/daftar-pelanggan') || request()->is('master-data/daftar-karyawan')
                             ? 'active' : '' }}">
                             <a href="#" data-toggle="dropdown" class="nav-link has-dropdown"><i
                                     class="far fa-clone"></i><span>Master Data</span></a>
@@ -93,39 +94,37 @@
                                 <li class="nav-item {{ request()->is('kategori/pembayaran') ? 'active' : '' }}">
                                     <a href="/kategori/pembayaran" class="nav-link">Kategori Pembayaran</a>
                                 </li>
+                                <li class="nav-item {{ request()->is('kategori/satuan') ? 'active' : '' }}">
+                                    <a href="/kategori/satuan" class="nav-link">Kategori Satuan</a>
+                                </li>
                                 <div class="dropdown-title">DATA DATA</div>
                                 <li class="nav-item {{ request()->is('master-data/produk') ? 'active' : '' }}">
                                     <a href="/master-data/produk" class="nav-link">Produk</a>
                                 </li>
-                                <li class="nav-item {{ request()->is('master-data/pelanggan') ? 'active' : '' }}">
-                                    <a href="/master-data/pelanggan" class="nav-link">Pelanggan</a>
+                                <li
+                                    class="nav-item {{ request()->is('master-data/daftar-pelanggan') ? 'active' : '' }}">
+                                    <a href="/master-data/daftar-pelanggan" class="nav-link">Daftar Pelanggan</a>
                                 </li>
-                                <li class="nav-item {{ request()->is('master-data/karyawan') ? 'active' : '' }}">
-                                    <a href="/master-data/karyawan" class="nav-link">Karyawan</a>
-                                </li>
-                                <li class="nav-item {{ request()->is('master-data/pengeluaran') ? 'active' : '' }}">
-                                    <a href="/master-data/pengeluaran" class="nav-link">Pengeluaran</a>
-                                </li>
-                                <li class="nav-item {{ request()->is('master-data/slip-gaji') ? 'active' : '' }}">
-                                    <a href="/master-data/slip-gaji" class="nav-link">Slip Gaji</a>
+                                <li class="nav-item {{ request()->is('master-data/daftar-karyawan') ? 'active' : '' }}">
+                                    <a href="/master-data/daftar-karyawan" class="nav-link">Daftar Karyawan</a>
                                 </li>
                             </ul>
                         </li>
                         <li class="nav-item dropdown {{ 
-                            request()->is('persediaan/stok-masuk') || request()->is('persediaan/stok-keluar') || request()->is('persediaan/saldo-awal-stok') || request()->is('persediaan/stok-opname') || request()->is('persediaan/kartu-stok')
+                            request()->is('persediaan/stok-masuk') || request()->is('persediaan/stok-keluar') || request()->is('persediaan/saldo-awal-item') || request()->is('persediaan/stok-opname') || request()->is('persediaan/kartu-stok')
                             ? 'active' : '' }}">
                             <a href="#" data-toggle="dropdown" class="nav-link has-dropdown">
                                 <i class="far fa-inventory"></i><span>Persediaan</span>
                             </a>
                             <ul class="dropdown-menu">
+                                <li class="nav-item {{ request()->is('persediaan/saldo-awal-item') ? 'active' : '' }}">
+                                    <a href="/persediaan/saldo-awal-item" class="nav-link">Saldo Awal Item</a>
+                                </li>
                                 <li class="nav-item {{ request()->is('persediaan/stok-masuk') ? 'active' : '' }}">
                                     <a href="/persediaan/stok-masuk" class="nav-link">Stok Masuk</a>
                                 </li>
                                 <li class="nav-item {{ request()->is('persediaan/stok-keluar') ? 'active' : '' }}">
                                     <a href="/persediaan/stok-keluar" class="nav-link">Stok Keluar</a>
-                                </li>
-                                <li class="nav-item {{ request()->is('persediaan/saldo-awal-stok') ? 'active' : '' }}">
-                                    <a href="/persediaan/saldo-awal-stok" class="nav-link">Saldo Awal Stok</a>
                                 </li>
                                 <li class="nav-item {{ request()->is('persediaan/stok-opname') ? 'active' : '' }}">
                                     <a href="/persediaan/stok-opname" class="nav-link">Stok Opname</a>
@@ -151,54 +150,73 @@
                             </ul>
                         </li>
                         <li class="nav-item dropdown {{ 
-                            request()->is('laporan/transaksi') || request()->is('laporan/pembayaran-non-tunai') ||  request()->is('laporan/transaksi-batal') || request()->is('laporan/komisi-karyawan') || request()->is('laporan/pengeluaran')
+                            request()->is('keuangan/pemasukan') || request()->is('keuangan/pengeluaran') || request()->is('keuangan/buku-besar')
                             ? 'active' : '' }}">
                             <a href="#" data-toggle="dropdown" class="nav-link has-dropdown">
-                                <i class="far fa-files"></i><span>Laporan</span>
+                                <i class="far fa-money-bill"></i><span>Keuangan</span>
                             </a>
                             <ul class="dropdown-menu">
-                                <li class="nav-item {{ request()->is('laporan/transaksi') ? 'active' : '' }}">
-                                    <a href="/laporan/transaksi" class="nav-link">Laporan Transaksi</a>
+                                <li class="nav-item {{ request()->is('keuangan/pemasukan') ? 'active' : '' }}">
+                                    <a href="/keuangan/pemasukan" class="nav-link">Pemasukan</a>
                                 </li>
-                                <li
-                                    class="nav-item {{ request()->is('laporan/pembayaran-non-tunai') ? 'active' : '' }}">
-                                    <a href="/laporan/pembayaran-non-tunai" class="nav-link">Laporan Pembayaran Non
-                                        Tunai</a>
+                                <li class="nav-item {{ request()->is('keuangan/pengeluaran') ? 'active' : '' }}">
+                                    <a href="/keuangan/pengeluaran" class="nav-link">Pengeluaran</a>
                                 </li>
-                                <li class="nav-item {{ request()->is('laporan/transaksi-batal') ? 'active' : '' }}">
-                                    <a href="/laporan/transaksi-batal" class="nav-link">Laporan Transaksi Batal</a>
+                                <li class="nav-item {{ request()->is('keuangan/buku-besar') ? 'active' : '' }}">
+                                    <a href="/keuangan/buku-besar" class="nav-link">Buku Besar</a>
                                 </li>
-                                <li class="nav-item {{ request()->is('laporan/komisi-karyawan') ? 'active' : '' }}">
-                                    <a href="/laporan/komisi-karyawan" class="nav-link">Laporan Komisi Karyawan</a>
+                                <li class="nav-item {{ request()->is('keuangan/slip-gaji') ? 'active' : '' }}">
+                                    <a href="/keuangan/slip-gaji" class="nav-link">Slip Gaji</a>
                                 </li>
-                                <li class="nav-item {{ request()->is('laporan/pengeluaran') ? 'active' : '' }}">
-                                    <a href="/laporan/pengeluaran" class="nav-link">Laporan Pengeluaran</a>
-                                </li>
-                            </ul>
-                        </li>
-                        <li class="nav-item dropdown {{ 
+                                {{-- <li class="nav-item {{ request()->is('kas/saldo-awal') ? 'active' : '' }}">
+                                <a href="/kas/saldo-awal" class="nav-link">Saldo Awal Kas</a>
+                        </li> --}}
+                    </ul>
+                    </li>
+                    <li class="nav-item dropdown {{ 
+                            request()->is('laporan/transaksi') || request()->is('laporan/pembayaran-non-tunai') || request()->is('laporan/komisi-karyawan') || request()->is('laporan/pengeluaran')
+                            ? 'active' : '' }}">
+                        <a href="#" data-toggle="dropdown" class="nav-link has-dropdown">
+                            <i class="far fa-files"></i><span>Laporan</span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li class="nav-item {{ request()->is('laporan/transaksi') ? 'active' : '' }}">
+                                <a href="/laporan/transaksi" class="nav-link">Laporan Transaksi</a>
+                            </li>
+                            <li class="nav-item {{ request()->is('laporan/pembayaran-non-tunai') ? 'active' : '' }}">
+                                <a href="/laporan/pembayaran-non-tunai" class="nav-link">Laporan Pembayaran Non
+                                    Tunai</a>
+                            </li>
+                            <li class="nav-item {{ request()->is('laporan/komisi-karyawan') ? 'active' : '' }}">
+                                <a href="/laporan/komisi-karyawan" class="nav-link">Laporan Komisi Karyawan</a>
+                            </li>
+                            <li class="nav-item {{ request()->is('laporan/pengeluaran') ? 'active' : '' }}">
+                                <a href="/laporan/pengeluaran" class="nav-link">Laporan Pengeluaran</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown {{ 
                             request()->is('pengaturan/profile-usaha') || request()->is('pengaturan/reset-no-transaksi') || request()->is('pengaturan/backup-restore') || request()->is('pengaturan/control-user')
                             ? 'active' : '' }}">
-                            <a href="#" data-toggle="dropdown" class="nav-link has-dropdown">
-                                <i class="far fa-cogs"></i><span>Pengaturan</span>
-                            </a>
-                            <ul class="dropdown-menu">
-                                <li class="nav-item {{ request()->is('pengaturan/profile-usaha') ? 'active' : '' }}">
-                                    <a href="/pengaturan/profile-usaha" class="nav-link">Profile Usaha</a>
-                                </li>
-                                <li
-                                    class="nav-item {{ request()->is('pengaturan/reset-no-transaksi') ? 'active' : '' }}">
-                                    <a href="/pengaturan/reset-no-transaksi" class="nav-link">Reset No. Transaksi</a>
-                                </li>
-                                <li class="nav-item {{ request()->is('pengaturan/backup-restore') ? 'active' : '' }}">
-                                    <a href="/pengaturan/backup-restore" class="nav-link">Backup & Restore</a>
-                                </li>
-                                <li class="nav-item {{ request()->is('pengaturan/control-user') ? 'active' : '' }}">
-                                    <a href="/pengaturan/control-user" class="nav-link">Control User</a>
-                                </li>
-                            </ul>
-                        </li>
-                        @endif
+                        <a href="#" data-toggle="dropdown" class="nav-link has-dropdown">
+                            <i class="far fa-cogs"></i><span>Pengaturan</span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li class="nav-item {{ request()->is('pengaturan/profile-usaha') ? 'active' : '' }}">
+                                <a href="/pengaturan/profile-usaha" class="nav-link">Profile Usaha</a>
+                            </li>
+                            <li class="nav-item {{ request()->is('pengaturan/reset-no-transaksi') ? 'active' : '' }}">
+                                <a href="/pengaturan/reset-no-transaksi" class="nav-link">Reset No. Transaksi</a>
+                            </li>
+                            <li class="nav-item {{ request()->is('pengaturan/backup-restore') ? 'active' : '' }}">
+                                <a href="/pengaturan/backup-restore" class="nav-link">Backup & Restore</a>
+                            </li>
+                            <li class="nav-item {{ request()->is('pengaturan/control-user') ? 'active' : '' }}">
+                                <a href="/pengaturan/control-user" class="nav-link">Control User</a>
+                            </li>
+                        </ul>
+                    </li>
+                    @endif
                     </ul>
                 </div>
             </nav>
@@ -213,7 +231,7 @@
                         href="http://fahmiibrahimdev.tech/">Fahmi Ibrahim</a>
                 </div>
                 <div class="footer-right">
-                    1.0.0
+                    1.1.0
                 </div>
             </footer>
         </div>

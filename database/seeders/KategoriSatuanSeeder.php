@@ -2,11 +2,11 @@
 
 namespace Database\Seeders;
 
-use App\Models\KategoriProduk;
+use App\Models\KategoriSatuan;
 use Illuminate\Database\Seeder;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
-class KategoriProdukSeeder extends Seeder
+class KategoriSatuanSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -15,19 +15,19 @@ class KategoriProdukSeeder extends Seeder
     {
         $data = [
             [
-                'nama_kategori'       => 'Produk Barbershop',
+                'nama_satuan'         => 'Pcs',
                 'deskripsi'           => '',
             ],
             [
-                'nama_kategori'       => 'Jasa Barbershop',
+                'nama_satuan'         => 'Kali',
                 'deskripsi'           => '',
             ],
             [
-                'nama_kategori'       => 'Produk Umum',
+                'nama_satuan'         => 'Jam',
                 'deskripsi'           => '',
             ],
         ];
 
-        KategoriProduk::insert($data);
+        KategoriSatuan::insert($data);
     }
 }
