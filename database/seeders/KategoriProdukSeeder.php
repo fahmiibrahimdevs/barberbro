@@ -23,6 +23,10 @@ class KategoriProdukSeeder extends Seeder
                 'deskripsi'           => '',
             ],
             [
+                'nama_kategori'       => 'Treatment',
+                'deskripsi'           => '',
+            ],
+            [
                 'nama_kategori'       => 'Produk Umum',
                 'deskripsi'           => '',
             ],

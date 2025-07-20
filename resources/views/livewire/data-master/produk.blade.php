@@ -28,11 +28,12 @@
                             <thead class='tw-sticky tw-top-0'>
                                 <tr class='tw-text-gray-700'>
                                     <th width='6%' class='text-center'>No</th>
-                                    <th width='60%' class='tw-whitespace-nowrap'>Nama Kategori</th>
+                                    <th width='80%' class='tw-whitespace-nowrap'>Nama Kategori</th>
                                     {{-- <th class='tw-whitespace-nowrap'>Kode Item</th> --}}
-                                    <th width='10%' class='tw-whitespace-nowrap tw-text-right'>Harga</th>
-                                    <th width='10%' class='tw-whitespace-nowrap tw-text-right'>Stock</th>
-                                    <th width='10%' class='tw-whitespace-nowrap tw-text-center'>Satuan</th>
+                                    <th width='3%' class='tw-whitespace-nowrap tw-text-right'>Harga</th>
+                                    <th width='3%' class='tw-whitespace-nowrap tw-text-right'>Stock</th>
+                                    <th width='3%' class='tw-whitespace-nowrap tw-text-right'>Satuan</th>
+                                    <th width='10%' class='tw-whitespace-nowrap tw-text-right'>Komisi (%)</th>
                                     {{-- <th class='tw-whitespace-nowrap'>Harga Pokok</th> --}}
                                     {{-- <th class='tw-whitespace-nowrap'>Harga Jual</th> --}}
                                     <th width='10%' class='text-center'><i class='fas fa-cog'></i></th>
@@ -41,27 +42,42 @@
                             <tbody>
                                 @forelse ($data->groupBy('nama_cabang') as $row)
                                 <tr>
-                                    <td class="tw-text-sm tw-tracking-wider" colspan="6">
+                                    <td class="tw-text-sm tw-tracking-wider" colspan="10">
                                         <b>Lokasi: {{ $row[0]['nama_cabang'] }}</b>
                                     </td>
                                 </tr>
                                 @foreach ($row as $result)
                                 <tr class='text-center'>
                                     <td class='tw-whitespace-nowrap'>{{ $loop->index + 1 }}</td>
-                                    <td class=' text-left tw-flex tw-items-center'>
+                                    <td class='text-left tw-flex tw-items-center'>
                                         <img src="{{ asset('assets/stisla/img/example-image-50.jpg') }}"
                                             class="tw-rounded-lg tw-w-16 tw-h-16 tw-object-cover tw-mr-3">
                                         <div class="tw--mt-1">
                                             <p class="tw-font-bold">{{ $result['nama_kategori'] }}</p>
-                                            <p class="tw-leading-5 tw-text-gray-500">{{ $result['nama_item'] }}</p>
-                                            <p>{{ $result['deskripsi'] }}</p>
+                                            <p class="tw-leading-5 tw-whitespace-nowrap tw-text-gray-600">{{ $result['nama_item'] }}</p>
+                                            <p class="tw-leading-5 tw-text-xs tw-text-gray-400">{{ $result['deskripsi'] }}</p>
                                         </div>
                                     </td>
                                     {{-- <td class='tw-whitespace-nowrap text-left'>{{ $result['kode_item'] }}</td> --}}
-                                    <td class='tw-whitespace-nowrap text-right'>
+                                    <td class='tw-pl-20 text-right'>
                                         Rp{{ number_format($result['harga_jasa'], 0, ',', '.') }}</td>
-                                    <td class='tw-whitespace-nowrap text-right'>{{ $result['stock'] }}</td>
-                                    <td class='tw-whitespace-nowrap text-center'>{{ $result['nama_satuan'] }}</td>
+                                    <td class='tw-whitespace-nowrap text-right'>
+                                        @if ($result['nama_kategori'] == "Produk Barbershop")
+                                        {{ $result['stock'] }},00
+                                        @else
+                                            -
+                                        @endif
+                                    </td>
+                                    <td class='tw-whitespace-nowrap text-right'>{{ $result['nama_satuan'] }}</td>
+                                    <td class='tw-whitespace-nowrap text-right'>
+                                        @if ($result['nama_kategori'] == "Produk Barbershop")
+                                            {{ $result['komisi'] }}%
+                                        @else
+                                            <i title="Jumlah karyawan yang dapat komisi">
+                                                {{ $komisi_data[$result['id']] ?? 0 }} dari {{ $total_karyawan }} capster
+                                            </i>
+                                        @endif
+                                    </td>
                                     {{-- <td class='tw-whitespace-nowrap text-left'>{{ $result['harga_pokok'] }}</td>
                                     --}}
                                     {{-- <td class='tw-whitespace-nowrap text-left'>{{ $result['harga_jual'] }}</td>
@@ -80,7 +96,7 @@
                                 @endforeach
                                 @empty
                                 <tr>
-                                    <td colspan='6' class='text-center'>No data available in the table</td>
+                                    <td colspan='10' class='text-center'>No data available in the table</td>
                                 </tr>
                                 @endforelse
                             </tbody>
@@ -98,9 +114,9 @@
         </button>
     </section>
 
-    <div class='modal fade' wire:ignore.self id='formDataModal' aria-labelledby='formDataModalLabel' aria-hidden='true'>
-        <div class='modal-dialog'>
-            <div class='modal-content'>
+    <div class='modal fade' data-backdrop="static" wire:ignore.self id='formDataModal' aria-labelledby='formDataModalLabel' aria-hidden='true'>
+        <div class='modal-dialog tw-w-full tw-m-0 sm:tw-w-auto sm:tw-m-[1.75rem_auto]'>
+            <div class='modal-content tw-rounded-none lg:tw-rounded-md'>
                 <div class='modal-header'>
                     <h5 class='modal-title' id='formDataModalLabel'>{{ $isEditing ? 'Edit Data' : 'Add Data' }}</h5>
                     <button type='button' wire:click='cancel()' class='close' data-dismiss='modal' aria-label='Close'>
@@ -108,103 +124,157 @@
                     </button>
                 </div>
                 <form>
-                    <div class='modal-body'>
-                        <div class="row">
-                            <div class="col-lg-6">
-                                <div class='form-group'>
-                                    <label for='id_cabang'>Cabang Lokasi</label>
-                                    {{-- <span>{{ $id_cabang }}</span> --}}
-                                    <div wire:ignore>
-                                        <select wire:model='id_cabang' id='id_cabang' class='form-control select2'>
-                                            @foreach ($cabangs as $cabang)
-                                            <option value='{{ $cabang->id }}'>{{ $cabang->nama_cabang }}</option>
-                                            @endforeach
-                                        </select>
+                    <div class='modal-body tw-p-0'>
+                        <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+                            <li class="nav-item tw-pl-4 tw-pt-4 lg:tw-pl-6" role="presentation" wire:ignore>
+                                <button class="nav-link active" id="pills-1-tab" data-toggle="pill"
+                                    data-target="#pills-1" type="button" role="tab" aria-controls="pills-1"
+                                    aria-selected="true">Form Produk</button>
+                            </li>
+                            @if (!$isKomisi)
+                            <li class="nav-item tw-pt-4" role="presentation" wire:ignore>
+                                <button class="nav-link" id="pills-2-tab" data-toggle="pill" data-target="#pills-2"
+                                    type="button" role="tab" aria-controls="pills-2" aria-selected="false">Set Komisi
+                                    (%)</button>
+                            </li>
+                            @endif
+                        </ul>
+                        <div class="tab-content" id="pills-tabContent" wire:ignore.self>
+                            <div class="tab-pane fade show active tw-px-4 lg:tw-px-6" id="pills-1" role="tabpanel" aria-labelledby="pills-1-tab">
+                                <div class="row">
+                                    <div class="col-lg-6">
+                                        <div class='form-group'>
+                                            <label for='id_cabang'>Cabang Lokasi</label>
+                                            {{-- <span>{{ $id_cabang }}</span> --}}
+                                            <div wire:ignore>
+                                                <select wire:model='id_cabang' id='id_cabang'
+                                                    class='form-control select2'>
+                                                    @foreach ($cabangs as $cabang)
+                                                    <option value='{{ $cabang->id }}'>{{ $cabang->nama_cabang }}
+                                                    </option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                            @error('id_cabang') <span class='text-danger'>{{ $message }}</span>
+                                            @enderror
+                                        </div>
                                     </div>
-                                    @error('id_cabang') <span class='text-danger'>{{ $message }}</span> @enderror
-                                </div>
-                            </div>
-                            <div class="col-lg-6">
-                                <div class='form-group'>
-                                    <label for='id_kategori'>Kategori</label>
-                                    {{-- <span>{{ $id_kategori }}</span> --}}
-                                    <div wire:ignore>
-                                        <select wire:model='id_kategori' id='id_kategori' class='form-control select2'>
-                                            @foreach ($kategoris as $kategori)
-                                            <option value='{{ $kategori->id }}'>{{ $kategori->nama_kategori }}</option>
-                                            @endforeach
-                                        </select>
+                                    <div class="col-lg-6">
+                                        <div class='form-group'>
+                                            <label for='id_kategori'>Kategori</label>
+                                            {{-- <span>{{ $id_kategori }}</span> --}}
+                                            <div wire:ignore>
+                                                <select wire:model='id_kategori' id='id_kategori'
+                                                    class='form-control select2'>
+                                                    @foreach ($kategoris as $kategori)
+                                                    <option value='{{ $kategori->id }}'>{{ $kategori->nama_kategori }}
+                                                    </option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                            @error('id_kategori') <span class='text-danger'>{{ $message }}</span>
+                                            @enderror
+                                        </div>
                                     </div>
-                                    @error('id_kategori') <span class='text-danger'>{{ $message }}</span> @enderror
                                 </div>
-                            </div>
-                        </div>
-                        <div class='form-group'>
-                            <label for='kode_item'>Kode Item</label>
-                            <input type='text' wire:model='kode_item' id='kode_item' class='form-control'>
-                            @error('kode_item') <span class='text-danger'>{{ $message }}</span> @enderror
-                        </div>
-                        <div class='form-group'>
-                            <label for='nama_item'>Nama Item</label>
-                            <input type='text' wire:model='nama_item' id='nama_item' class='form-control'>
-                            @error('nama_item') <span class='text-danger'>{{ $message }}</span> @enderror
-                        </div>
-                        <div class="row">
-                            <div class="col-lg-6">
+                                {{-- <div class='form-group'>
+                                    <label for='kode_item'>Kode Item</label>
+                                    <input type='text' wire:model='kode_item' id='kode_item' class='form-control'>
+                                    @error('kode_item') <span class='text-danger'>{{ $message }}</span> @enderror
+                                </div> --}}
                                 <div class='form-group'>
-                                    <label for='harga_jasa'>Harga</label>
-                                    <input type='number' wire:model='harga_jasa' id='harga_jasa' class='form-control'>
-                                    @error('harga_jasa') <span class='text-danger'>{{ $message }}</span> @enderror
+                                    <label for='nama_item'>Nama Item</label>
+                                    <input type='text' wire:model='nama_item' id='nama_item' class='form-control'>
+                                    @error('nama_item') <span class='text-danger'>{{ $message }}</span> @enderror
                                 </div>
-                            </div>
-                            <div class="col-lg-6">
-                                <div class='form-group'>
-                                    <label for='id_satuan'>Satuan</label>
-                                    {{-- <span>{{ $id_satuan }}</span> --}}
-                                    <div wire:ignore>
-                                        <select wire:model='id_satuan' id='id_satuan' class='form-control select2'>
-                                            @foreach ($satuans as $satuan)
-                                            <option value='{{ $satuan->id }}'>{{ $satuan->nama_satuan }}</option>
-                                            @endforeach
-                                        </select>
+                                <div class="row">
+                                    <div class="col-lg-6">
+                                        <div class='form-group'>
+                                            <label for='harga_jasa'>Harga</label>
+                                            <input type='number' wire:model='harga_jasa' id='harga_jasa'
+                                                class='form-control'>
+                                            @error('harga_jasa') <span class='text-danger'>{{ $message }}</span> @enderror
+                                        </div>
                                     </div>
-                                    @error('id_satuan') <span class='text-danger'>{{ $message }}</span> @enderror
+                                    <div class="col-lg-6">
+                                        <div class='form-group'>
+                                            <label for='id_satuan'>Satuan</label>
+                                            {{-- <span>{{ $id_satuan }}</span> --}}
+                                            <div wire:ignore>
+                                                <select wire:model='id_satuan' id='id_satuan' class='form-control select2'>
+                                                    @foreach ($satuans as $satuan)
+                                                    <option value='{{ $satuan->id }}'>{{ $satuan->nama_satuan }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                            @error('id_satuan') <span class='text-danger'>{{ $message }}</span> @enderror
+                                        </div>
+                                    </div>
+                                </div>
+                                @if ($isKomisi)
+                                <div class='form-group'>
+                                    <label for='komisi'>Komisi (%)</label>
+                                    <input type='number' wire:model='komisi' id='komisi' class='form-control'>
+                                    @error('komisi') <span class='text-danger'>{{ $message }}</span> @enderror
+                                </div>
+                                @endif
+                                {{-- <div class='form-group'>
+                                    <label for='harga_pokok'>Harga Pokok</label>
+                                    <input type='number' wire:model='harga_pokok' id='harga_pokok' class='form-control'>
+                                    @error('harga_pokok') <span class='text-danger'>{{ $message }}</span> @enderror
+                                </div>
+                                <div class='form-group'>
+                                    <label for='harga_jual'>Harga Jual</label>
+                                    <input type='number' wire:model='harga_jual' id='harga_jual' class='form-control'>
+                                    @error('harga_jual') <span class='text-danger'>{{ $message }}</span> @enderror
+                                </div> --}}
+                                <div class='form-group'>
+                                    <label for='deskripsi'>Deskripsi</label>
+                                    <textarea wire:model='deskripsi' id='deskripsi' class='form-control'
+                                        style='height: 100px !important;'></textarea>
+                                    @error('deskripsi') <span class='text-danger'>{{ $message }}</span> @enderror
+                                </div>
+                                <div class='form-group'>
+                                    <label for='gambar'>Gambar</label>
+                                    <input type='file' wire:model='gambar' id='gambar' class='form-control'>
+                                    @error('gambar') <span class='text-danger'>{{ $message }}</span> @enderror
                                 </div>
                             </div>
+                            <div class="tab-pane fade" id="pills-2" role="tabpanel" aria-labelledby="pills-2-tab">
+                                {{-- <pre><code>{{ json_encode($komisi_karyawan, JSON_PRETTY_PRINT) }}</code></pre> --}}
+                                <table class="table-responsive tw-w-full tw-table-auto">
+                                    <thead>
+                                        <tr class="tw-whitespace-nowrap">
+                                            <th width="5%">No</th>
+                                            <th width="90%">Nama Karyawan</th>
+                                            <th width="5%">Komisi (%)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($karyawans as $karyawan)
+                                        <tr wire:key="komisi-{{ $karyawan->id }}">
+                                            <td class="tw-whitespace-nowrap">{{ $loop->index + 1 }}</td>
+                                            <td>{{ $karyawan->name }}</td>
+                                            <td>
+                                                <input type="number" step="1" wire:model="komisi_karyawan.{{ $karyawan->id }}" class="form-control tw-ml-auto tw-text-right tw-w-full">
+                                            </td>
+                                        </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
-
-                        {{-- <div class='form-group'>
-                            <label for='harga_pokok'>Harga Pokok</label>
-                            <input type='number' wire:model='harga_pokok' id='harga_pokok' class='form-control'>
-                            @error('harga_pokok') <span class='text-danger'>{{ $message }}</span> @enderror
                     </div>
-                    <div class='form-group'>
-                        <label for='harga_jual'>Harga Jual</label>
-                        <input type='number' wire:model='harga_jual' id='harga_jual' class='form-control'>
-                        @error('harga_jual') <span class='text-danger'>{{ $message }}</span> @enderror
-                    </div> --}}
-                    <div class='form-group'>
-                        <label for='deskripsi'>Deskripsi</label>
-                        <textarea wire:model='deskripsi' id='deskripsi' class='form-control'
-                            style='height: 100px !important;'></textarea>
-                        @error('deskripsi') <span class='text-danger'>{{ $message }}</span> @enderror
+                    <div class='modal-footer'>
+                        <button type='button' wire:click='cancel()' class='btn btn-secondary tw-bg-gray-300'
+                            data-dismiss='modal'>Close</button>
+                        <button type='submit' wire:click.prevent='{{ $isEditing ? 'update()' : 'store()' }}'
+                            wire:loading.attr='disabled' class='btn btn-primary tw-bg-blue-500'>Save Data</button>
                     </div>
-                    <div class='form-group'>
-                        <label for='gambar'>Gambar</label>
-                        <input type='file' wire:model='gambar' id='gambar' class='form-control'>
-                        @error('gambar') <span class='text-danger'>{{ $message }}</span> @enderror
-                    </div>
+                </form>
             </div>
-            <div class='modal-footer'>
-                <button type='button' wire:click='cancel()' class='btn btn-secondary tw-bg-gray-300'
-                    data-dismiss='modal'>Close</button>
-                <button type='submit' wire:click.prevent='{{ $isEditing ? 'update()' : 'store()' }}'
-                    wire:loading.attr='disabled' class='btn btn-primary tw-bg-blue-500'>Save Data</button>
-            </div>
-            </form>
         </div>
     </div>
-</div>
 </div>
 
 @push('general-css')
@@ -231,6 +301,15 @@
             });
         });
     })
-
+    window.addEventListener('setBackNavs', event => {
+        $(document).ready(function () {
+            setTimeout(() => {
+                $('#pills-1-tab').addClass('active')
+                $('#pills-2-tab').removeClass('active')
+                $('#pills-1').addClass('active show')
+                $('#pills-2').removeClass('active show')
+            }, 500);
+        });
+    })
 </script>
 @endpush

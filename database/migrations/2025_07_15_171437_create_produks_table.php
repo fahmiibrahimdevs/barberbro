@@ -13,18 +13,19 @@ return new class extends Migration
     {
         Schema::create('produk', function (Blueprint $table) {
             $table->id();
-            $table->text('id_cabang')->default('');
-            $table->text('id_user')->default('');
-            $table->text('id_kategori')->default('');
-            $table->text('id_satuan')->default('');
-            $table->text('kode_item')->default('');
-            $table->text('nama_item')->default('');
-            $table->text('harga_jasa')->default('');
-            $table->text('harga_pokok')->default('');
-            $table->text('harga_jual')->default('');
-            $table->text('stock')->default('');
-            $table->text('deskripsi')->default('');
-            $table->text('gambar')->default('');
+            $table->text('id_cabang')->nullable();
+            $table->text('id_user')->nullable();
+            $table->text('id_kategori')->nullable();
+            $table->text('id_satuan')->nullable();
+            $table->text('kode_item')->nullable();
+            $table->text('nama_item')->nullable();
+            $table->text('harga_jasa')->nullable();
+            $table->text('komisi')->nullable();
+            $table->text('harga_pokok')->nullable();
+            $table->text('harga_jual')->nullable();
+            $table->text('stock')->nullable();
+            $table->text('deskripsi')->nullable();
+            $table->text('gambar')->nullable();
             $table->timestamps();
         });
     }

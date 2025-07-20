@@ -231,7 +231,7 @@
                         href="http://fahmiibrahimdev.tech/">Fahmi Ibrahim</a>
                 </div>
                 <div class="footer-right">
-                    1.1.0
+                    1.2.0
                 </div>
             </footer>
         </div>

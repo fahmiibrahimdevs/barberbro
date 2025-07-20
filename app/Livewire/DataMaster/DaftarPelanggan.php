@@ -24,7 +24,7 @@ class DaftarPelanggan extends Component
     protected $rules = [
         'id_user'             => 'required',
         'id_cabang'           => 'required',
-        'nama_lengkap'        => 'required',
+        'nama_pelanggan'      => 'required',
         'no_telp'             => '',
         'deskripsi'           => '',
         'gambar'              => '',
@@ -37,7 +37,7 @@ class DaftarPelanggan extends Component
 
     public $dataId;
     public $cabangs;
-    public $id_user, $id_cabang, $nama_lengkap, $no_telp, $deskripsi, $gambar;
+    public $id_user, $id_cabang, $nama_pelanggan, $no_telp, $deskripsi, $gambar;
 
     public function mount(GlobalDataService $globalDataService)
     {
@@ -55,13 +55,13 @@ class DaftarPelanggan extends Component
         $this->searchResetPage();
         $search = '%' . $this->searchTerm . '%';
 
-        $data = ModelsDaftarPelanggan::select('daftar_pelanggan.id', 'daftar_pelanggan.nama_lengkap', 'daftar_pelanggan.no_telp', 'daftar_pelanggan.deskripsi', 'daftar_pelanggan.gambar', 'cabang_lokasi.nama_cabang', 'users.name')
+        $data = ModelsDaftarPelanggan::select('daftar_pelanggan.id', 'daftar_pelanggan.nama_pelanggan', 'daftar_pelanggan.no_telp', 'daftar_pelanggan.deskripsi', 'daftar_pelanggan.gambar', 'cabang_lokasi.nama_cabang', 'users.name')
             ->join('cabang_lokasi', 'cabang_lokasi.id', 'daftar_pelanggan.id_cabang')
             ->join('users', 'users.id', 'daftar_pelanggan.id_user')
             ->where(function ($query) use ($search) {
                 $query->where('name', 'LIKE', $search);
                 $query->orWhere('nama_cabang', 'LIKE', $search);
-                $query->orWhere('nama_lengkap', 'LIKE', $search);
+                $query->orWhere('nama_pelanggan', 'LIKE', $search);
                 $query->orWhere('daftar_pelanggan.no_telp', 'LIKE', $search);
             })
             ->orderBy('id', 'ASC')
@@ -77,7 +77,7 @@ class DaftarPelanggan extends Component
         ModelsDaftarPelanggan::create([
             'id_user'             => $this->id_user,
             'id_cabang'           => $this->id_cabang,
-            'nama_lengkap'        => $this->nama_lengkap,
+            'nama_pelanggan'      => $this->nama_pelanggan,
             'no_telp'             => $this->no_telp,
             'deskripsi'           => $this->deskripsi,
             'gambar'              => $this->gambar,
@@ -93,7 +93,7 @@ class DaftarPelanggan extends Component
         $this->dataId           = $id;
         $this->id_user          = $data->id_user;
         $this->id_cabang        = $data->id_cabang;
-        $this->nama_lengkap     = $data->nama_lengkap;
+        $this->nama_pelanggan   = $data->nama_pelanggan;
         $this->no_telp          = $data->no_telp;
         $this->deskripsi        = $data->deskripsi;
         $this->gambar           = $data->gambar;
@@ -109,7 +109,7 @@ class DaftarPelanggan extends Component
             ModelsDaftarPelanggan::findOrFail($this->dataId)->update([
                 'id_user'             => $this->id_user,
                 'id_cabang'           => $this->id_cabang,
-                'nama_lengkap'        => $this->nama_lengkap,
+                'nama_pelanggan'      => $this->nama_pelanggan,
                 'no_telp'             => $this->no_telp,
                 'deskripsi'           => $this->deskripsi,
                 'gambar'              => $this->gambar,
@@ -171,7 +171,7 @@ class DaftarPelanggan extends Component
     {
         $this->id_user             = Auth::user()->id;
         $this->id_cabang           = $this->cabangs->first()->id;
-        $this->nama_lengkap        = '';
+        $this->nama_pelanggan      = '';
         $this->no_telp             = '62';
         $this->deskripsi           = '-';
         $this->gambar              = '-';

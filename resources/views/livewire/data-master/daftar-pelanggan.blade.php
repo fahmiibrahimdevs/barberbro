@@ -85,7 +85,7 @@
         </button>
     </section>
 
-    <div class='modal fade' wire:ignore.self id='formDataModal' aria-labelledby='formDataModalLabel' aria-hidden='true'>
+    <div class='modal fade' data-backdrop="static" wire:ignore.self id='formDataModal' aria-labelledby='formDataModalLabel' aria-hidden='true'>
         <div class='modal-dialog'>
             <div class='modal-content'>
                 <div class='modal-header'>

@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->text('id_user')->default('');
             $table->text('id_cabang')->default('');
-            $table->text('nama_lengkap')->default('');
+            $table->text('nama_pelanggan')->default('');
             $table->text('no_telp')->default('62');
             $table->text('deskripsi')->default('-');
             $table->text('gambar')->default('-');

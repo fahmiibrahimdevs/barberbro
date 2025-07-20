@@ -5,10 +5,13 @@ namespace App\Livewire\DataMaster;
 use Livewire\Component;
 use App\Models\CabangLokasi;
 use Livewire\WithPagination;
+use App\Models\DaftarKaryawan;
 use App\Models\KategoriProduk;
 use App\Models\KategoriSatuan;
 use Livewire\Attributes\Title;
+use Illuminate\Support\Facades\DB;
 use App\Services\GlobalDataService;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Produk as ModelsProduk;
 
@@ -45,8 +48,10 @@ class Produk extends Component
     public $isEditing = false;
 
     public $dataId;
-    public $cabangs, $kategoris, $satuans;
-    public $id_cabang, $id_user, $id_kategori, $id_satuan, $kode_item, $nama_item, $harga_jasa, $harga_pokok, $harga_jual, $stock, $deskripsi, $gambar;
+    public $cabangs, $kategoris, $satuans, $karyawans;
+    public $dataKategoris, $komisi_karyawan, $komisi_karyawan_awal = [];
+    public $isKomisi = false, $total_karyawan;
+    public $id_cabang, $id_user, $id_kategori, $id_satuan, $kode_item, $nama_item, $harga_jasa, $komisi, $harga_pokok, $harga_jual, $stock, $deskripsi, $gambar;
 
     // Menggunakan mount untuk inject service
     public function mount(GlobalDataService $globalDataService)
@@ -59,7 +64,24 @@ class Produk extends Component
         $this->kategoris  = $this->globalDataService->getKategoris();
         $this->satuans    = $this->globalDataService->getSatuans();
 
+        $this->karyawans = $this->globalDataService->getKaryawans();
+
+        // Init komisi_karyawan default kosong
+        foreach ($this->karyawans as $karyawan) {
+            $this->komisi_karyawan[$karyawan->id] = null;
+        }
+
+        // dd($this->komisi_karyawan);
+
+        // dd($this->karyawans);
+
         $this->resetInputFields();
+    }
+
+    public function updatedIdKategori()
+    {
+        $this->id_kategori == "1" ? $this->isKomisi = true : $this->isKomisi = false;
+        // dd($this->isKomisi);
     }
 
     public function render()
@@ -67,42 +89,73 @@ class Produk extends Component
         $this->searchResetPage();
         $search = '%' . $this->searchTerm . '%';
 
-        $data = ModelsProduk::select('produk.id', 'produk.nama_item', 'produk.harga_jasa', 'produk.stock', 'produk.deskripsi', 'produk.gambar', 'cabang_lokasi.nama_cabang', 'kategori_produk.nama_kategori', 'kategori_satuan.nama_satuan')
+        $this->total_karyawan = DB::table('daftar_karyawan')->where('role_id', 'capster')->count();
+        $komisi_data = DB::table('komisi')
+            ->select('id_produk', DB::raw('count(*) as jumlah_komisi'))
+            ->whereNotNull('komisi_persen')
+            ->groupBy('id_produk')
+            ->pluck('jumlah_komisi', 'id_produk')
+            ->toArray();
+
+        $data = ModelsProduk::select('produk.id', 'produk.nama_item', 'produk.harga_jasa', 'produk.komisi', 'produk.stock', 'produk.deskripsi', 'produk.gambar', 'cabang_lokasi.nama_cabang', 'kategori_produk.nama_kategori', 'kategori_satuan.nama_satuan')
             ->leftJoin('cabang_lokasi', 'cabang_lokasi.id', 'produk.id_cabang')
             ->leftJoin('kategori_produk', 'kategori_produk.id', 'produk.id_kategori')
             ->leftJoin('kategori_satuan', 'kategori_satuan.id', 'produk.id_satuan')
             ->where(function ($query) use ($search) {
-                $query->where('id_cabang', 'LIKE', $search);
-                $query->orWhere('nama_kategori', 'LIKE', $search);
-                $query->orWhere('kode_item', 'LIKE', $search);
+                $query->where('nama_kategori', 'LIKE', $search);
                 $query->orWhere('nama_item', 'LIKE', $search);
             })
-            ->orderBy('id', 'ASC')
+            ->orderBy('nama_kategori', 'ASC')
             ->paginate($this->lengthData);
 
-        return view('livewire.data-master.produk', compact('data'));
+        return view('livewire.data-master.produk', compact('data', 'komisi_data'));
     }
 
     public function store()
     {
         $this->validate();
 
-        ModelsProduk::create([
-            'id_cabang'           => $this->id_cabang,
-            'id_user'             => $this->id_user,
-            'id_kategori'         => $this->id_kategori,
-            'id_satuan'           => $this->id_satuan,
-            'kode_item'           => $this->kode_item,
-            'nama_item'           => $this->nama_item,
-            'harga_jasa'          => $this->harga_jasa,
-            'harga_pokok'         => $this->harga_pokok,
-            'harga_jual'          => $this->harga_jual,
-            'stock'               => $this->stock,
-            'deskripsi'           => $this->deskripsi,
-            'gambar'              => $this->gambar,
-        ]);
+        DB::beginTransaction();
+        try {
+            // Simpan data produk
+            $produk = ModelsProduk::create([
+                'id_cabang'    => $this->id_cabang,
+                'id_user'      => $this->id_user,
+                'id_kategori'  => $this->id_kategori,
+                'id_satuan'    => $this->id_satuan,
+                'kode_item'    => $this->kode_item,
+                'nama_item'    => $this->nama_item,
+                'harga_jasa'   => $this->harga_jasa,
+                'harga_pokok'  => $this->harga_pokok,
+                'harga_jual'   => $this->harga_jual,
+                'stock'        => $this->stock,
+                'deskripsi'    => $this->deskripsi,
+                'gambar'       => $this->gambar,
+            ]);
 
-        $this->dispatchAlert('success', 'Success!', 'Data created successfully.');
+            // Siapkan data untuk insert ke pivot
+            $pivotData = [];
+
+            foreach ($this->komisi_karyawan as $idKaryawan => $persen) {
+                if (!is_null($persen)) {
+                    $pivotData[] = [
+                        'id_karyawan' => $idKaryawan,
+                        'id_produk' => $produk->id,
+                        'komisi_persen' => $persen,
+                    ];
+                }
+            }
+
+            // Insert langsung ke tabel pivot
+            DB::table('komisi')->insert($pivotData);
+
+            DB::commit();
+            $this->dispatchAlert('success', 'Success!', 'Produk dan komisi berhasil disimpan.');
+            $this->dispatch('setBackNavs');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            $this->dispatchAlert('error', 'Gagal!', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
     }
 
     public function edit($id)
@@ -118,11 +171,23 @@ class Produk extends Component
         $this->kode_item        = $data->kode_item;
         $this->nama_item        = $data->nama_item;
         $this->harga_jasa       = $data->harga_jasa;
+        $this->komisi           = $data->komisi;
         $this->harga_pokok      = $data->harga_pokok;
         $this->harga_jual       = $data->harga_jual;
         $this->stock            = $data->stock;
         $this->deskripsi        = $data->deskripsi;
         $this->gambar           = $data->gambar;
+        $this->updatedIdKategori();
+
+        // 🟡 Ambil komisi dari pivot dan isi ke $komisi_karyawan
+        $komisi = DB::table('komisi')
+            ->where('id_produk', $id)
+            ->get();
+
+        foreach ($komisi as $row) {
+            $this->komisi_karyawan[$row->id_karyawan] = $row->komisi_persen;
+            $this->komisi_karyawan_awal[$row->id_karyawan] = $row->komisi_persen;
+        }
     }
 
     public function update()
@@ -130,23 +195,58 @@ class Produk extends Component
         $this->validate();
 
         if ($this->dataId) {
-            ModelsProduk::findOrFail($this->dataId)->update([
-                'id_cabang'           => $this->id_cabang,
-                'id_user'             => Auth::user()->id,
-                'id_kategori'         => $this->id_kategori,
-                'id_satuan'           => $this->id_satuan,
-                'kode_item'           => $this->kode_item,
-                'nama_item'           => $this->nama_item,
-                'harga_jasa'          => $this->harga_jasa,
-                'harga_pokok'         => $this->harga_pokok,
-                'harga_jual'          => $this->harga_jual,
-                'stock'               => $this->stock,
-                'deskripsi'           => $this->deskripsi,
-                'gambar'              => $this->gambar,
-            ]);
+            DB::beginTransaction();
 
-            $this->dispatchAlert('success', 'Success!', 'Data updated successfully.');
-            $this->dataId = null;
+            try {
+                // 1. Update data produk
+                ModelsProduk::findOrFail($this->dataId)->update([
+                    'id_cabang'           => $this->id_cabang,
+                    'id_user'             => Auth::user()->id,
+                    'id_kategori'         => $this->id_kategori,
+                    'id_satuan'           => $this->id_satuan,
+                    // 'kode_item'           => $this->kode_item,
+                    'nama_item'           => $this->nama_item,
+                    'harga_jasa'          => $this->harga_jasa,
+                    'komisi'              => $this->komisi,
+                    // 'harga_pokok'         => $this->harga_pokok,
+                    // 'harga_jual'          => $this->harga_jual,
+                    // 'stock'               => $this->stock,
+                    'deskripsi'           => $this->deskripsi,
+                    // 'gambar'              => $this->gambar,
+                ]);
+
+                // Ambil dari properti yang sudah diisi saat edit
+                $komisiLama = $this->komisi_karyawan_awal ?? [];
+                $komisiBaru = $this->komisi_karyawan ?? [];
+
+                if ($komisiBaru !== $komisiLama) {
+                    DB::table('komisi')->where('id_produk', $this->dataId)->delete();
+
+                    $dataInsert = [];
+                    foreach ($komisiBaru as $id_karyawan => $persen) {
+                        $dataInsert[] = [
+                            'id_produk'      => $this->dataId,
+                            'id_karyawan'    => $id_karyawan,
+                            'komisi_persen'  => $persen,
+                        ];
+                    }
+
+                    if (!empty($dataInsert)) {
+                        DB::table('komisi')->insert($dataInsert);
+                    }
+                }
+
+                DB::commit();
+
+                $this->dispatchAlert('success', 'Success!', 'Produk & komisi berhasil diperbarui.');
+                $this->dispatch('setBackNavs');
+                $this->dataId = null;
+            } catch (\Exception $e) {
+                DB::rollBack();
+                // Optional: kirim ke log kalau perlu
+                Log::error('Gagal update produk: ' . $e->getMessage());
+                $this->dispatchAlert('error', 'Gagal!', 'Terjadi kesalahan: ' . $e->getMessage());
+            }
         }
     }
 
@@ -162,8 +262,24 @@ class Produk extends Component
 
     public function delete()
     {
-        ModelsProduk::findOrFail($this->dataId)->delete();
-        $this->dispatchAlert('success', 'Success!', 'Data deleted successfully.');
+        DB::beginTransaction();
+
+        try {
+            // 1. Hapus komisi dulu
+            DB::table('komisi')->where('id_produk', $this->dataId)->delete();
+
+            // 2. Hapus produk
+            ModelsProduk::findOrFail($this->dataId)->delete();
+
+            DB::commit();
+
+            $this->dispatchAlert('success', 'Success!', 'Data deleted successfully.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            Log::error('Gagal hapus produk: ' . $e->getMessage());
+            $this->dispatchAlert('error', 'Gagal!', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
     }
 
     public function updatingLengthData()
@@ -195,6 +311,7 @@ class Produk extends Component
     {
         $this->isEditing = $mode;
         $this->dispatch('initSelect2');
+        $this->updatedIdKategori();
     }
 
     private function resetInputFields()
@@ -203,19 +320,21 @@ class Produk extends Component
         $this->id_cabang           = $this->cabangs->first()->id;
         $this->id_kategori         = $this->kategoris->first()->id;
         $this->id_satuan           = $this->satuans->first()->id;
-        $this->kode_item           = '';
+        $this->kode_item           = NULL;
         $this->nama_item           = '';
         $this->harga_jasa          = '0';
-        $this->harga_pokok         = '0';
-        $this->harga_jual          = '0';
+        $this->komisi              = NULL;
+        $this->harga_pokok         = NULL;
+        $this->harga_jual          = NULL;
         $this->stock               = '0';
         $this->deskripsi           = '-';
-        $this->gambar              = '-';
+        $this->gambar              = NULL;
     }
 
     public function cancel()
     {
         $this->isEditing       = false;
         $this->resetInputFields();
+        $this->dispatch('setBackNavs');
     }
 }

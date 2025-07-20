@@ -19,6 +19,7 @@ use App\Livewire\Persediaan\SaldoAwalItem;
 use App\Livewire\Persediaan\StokKeluar;
 use App\Livewire\Persediaan\StokMasuk;
 use App\Livewire\Persediaan\StokOpname;
+use App\Livewire\Transaksi\Transaksi;
 
 Route::get('/', [AuthenticatedSessionController::class, 'create'])
     ->name('login');
@@ -44,6 +45,8 @@ Route::group(['middleware' => ['auth', 'role:direktur']], function () {
     Route::get('/persediaan/stok-keluar', StokKeluar::class);
     Route::get('/persediaan/stok-opname', StokOpname::class);
     Route::get('/persediaan/kartu-stok', KartuStok::class);
+
+    Route::get('/transaksi', Transaksi::class);
     // Route::get('/example', Example::class);
     Route::get('/pengaturan/control-user', ControlUser::class);
 });

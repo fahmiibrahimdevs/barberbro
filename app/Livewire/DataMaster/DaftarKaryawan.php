@@ -187,7 +187,7 @@ class DaftarKaryawan extends Component
             }
         } catch (\Exception $e) {
             DB::rollBack();
-            $this->dispatchAlert('error', 'Error!', 'Something went wrong while store data.');
+            $this->dispatchAlert('error', 'Gagal!', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
 
