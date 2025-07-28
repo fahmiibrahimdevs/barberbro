@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Produk;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
 class ProdukSeeder extends Seeder
@@ -13,68 +14,32 @@ class ProdukSeeder extends Seeder
      */
     public function run(): void
     {
-        $data = [
-            [
-                'id_cabang'           => '',
-                'id_user'             => '0',
-                'id_kategori'         => '',
-                'id_satuan'           => '',
-                'kode_item'           => '',
-                'nama_item'           => '',
-                'harga_jasa'          => '0',
-                'harga_pokok'         => '0',
-                'harga_jual'          => '0',
-                'stock'               => '0',
-                'deskripsi'           => '',
-                'gambar'              => '',
-            ],
+        $data = [];
 
-            [
-                'id_cabang'           => '',
-                'id_user'             => '0',
-                'id_kategori'         => '',
-                'id_satuan'           => '',
-                'kode_item'           => '',
-                'nama_item'           => '',
-                'harga_jasa'          => '0',
-                'harga_pokok'         => '0',
-                'harga_jual'          => '0',
-                'stock'               => '0',
-                'deskripsi'           => '',
-                'gambar'              => '',
-            ],
+        for ($i = 1; $i <= 5000; $i++) {
+            $data[] = [
+                'id_cabang' => 1,
+                'id_user' => 1,
+                'id_kategori' => 1,
+                'id_satuan' => 1,
+                'kode_item' => null,
+                'nama_item' => 'Produk ke-' . $i,
+                'harga_jasa' => rand(10000, 100000),
+                'komisi' => rand(0, 100),
+                'harga_pokok' => null,
+                'harga_jual' => null,
+                'stock' => 0,
+                'deskripsi' => '-',
+                'gambar' => null,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
+        }
 
-            [
-                'id_cabang'           => '',
-                'id_user'             => '0',
-                'id_kategori'         => '',
-                'id_satuan'           => '',
-                'kode_item'           => '',
-                'nama_item'           => '',
-                'harga_jasa'          => '0',
-                'harga_pokok'         => '0',
-                'harga_jual'          => '0',
-                'stock'               => '0',
-                'deskripsi'           => '',
-                'gambar'              => '',
-            ],
+        DB::table('produk')->insert(array_chunk($data, 500)[0]); // Sisipkan 500 sekaligus
 
-            [
-                'id_cabang'           => '',
-                'id_user'             => '0',
-                'id_kategori'         => '',
-                'id_satuan'           => '',
-                'kode_item'           => '',
-                'nama_item'           => '',
-                'harga_jasa'          => '0',
-                'harga_pokok'         => '0',
-                'harga_jual'          => '0',
-                'stock'               => '0',
-                'deskripsi'           => '',
-                'gambar'              => '',
-            ],
-        ];
-
-        Produk::insert($data);
+        foreach (array_chunk($data, 500) as $chunk) {
+            DB::table('produk')->insert($chunk);
+        }
     }
 }

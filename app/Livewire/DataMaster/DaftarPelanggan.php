@@ -22,7 +22,6 @@ class DaftarPelanggan extends Component
     ];
 
     protected $rules = [
-        'id_user'             => 'required',
         'id_cabang'           => 'required',
         'nama_pelanggan'      => 'required',
         'no_telp'             => '',
@@ -73,17 +72,20 @@ class DaftarPelanggan extends Component
     public function store()
     {
         $this->validate();
+        try {
+            ModelsDaftarPelanggan::create([
+                'id_user'             => Auth::user()->id,
+                'id_cabang'           => $this->id_cabang,
+                'nama_pelanggan'      => $this->nama_pelanggan,
+                'no_telp'             => $this->no_telp,
+                'deskripsi'           => $this->deskripsi,
+                'gambar'              => $this->gambar,
+            ]);
 
-        ModelsDaftarPelanggan::create([
-            'id_user'             => $this->id_user,
-            'id_cabang'           => $this->id_cabang,
-            'nama_pelanggan'      => $this->nama_pelanggan,
-            'no_telp'             => $this->no_telp,
-            'deskripsi'           => $this->deskripsi,
-            'gambar'              => $this->gambar,
-        ]);
-
-        $this->dispatchAlert('success', 'Success!', 'Data created successfully.');
+            $this->dispatchAlert('success', 'Success!', 'Data created successfully.');
+        } catch (\Exception $e) {
+            $this->dispatchAlert('error', 'Gagal!', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
     }
 
     public function edit($id)
@@ -91,7 +93,6 @@ class DaftarPelanggan extends Component
         $this->isEditing        = true;
         $data = ModelsDaftarPelanggan::where('id', $id)->first();
         $this->dataId           = $id;
-        $this->id_user          = $data->id_user;
         $this->id_cabang        = $data->id_cabang;
         $this->nama_pelanggan   = $data->nama_pelanggan;
         $this->no_telp          = $data->no_telp;
@@ -107,7 +108,7 @@ class DaftarPelanggan extends Component
 
         if ($this->dataId) {
             ModelsDaftarPelanggan::findOrFail($this->dataId)->update([
-                'id_user'             => $this->id_user,
+                'id_user'             => Auth::user()->id,
                 'id_cabang'           => $this->id_cabang,
                 'nama_pelanggan'      => $this->nama_pelanggan,
                 'no_telp'             => $this->no_telp,

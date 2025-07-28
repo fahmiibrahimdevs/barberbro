@@ -38,7 +38,8 @@
                             <tbody>
                                 @forelse ($data as $row)
                                 <tr class='text-center'>
-                                    <td class='tw-whitespace-nowrap'>{{ $loop->index + 1 }}</td>
+                                    <td class='tw-whitespace-nowrap'>
+                                        {{ ($data->currentPage() - 1) * $data->perPage() + $loop->iteration }}</td>
                                     <td class='tw-whitespace-nowrap text-left'>{{ $row->nama_cabang }}</td>
                                     <td class='text-left'>{{ $row->alamat }}</td>
                                     <td class='tw-whitespace-nowrap text-left'>{{ $row->status }}</td>
@@ -74,7 +75,8 @@
         </button>
     </section>
 
-    <div class='modal fade' data-backdrop="static" wire:ignore.self id='formDataModal' aria-labelledby='formDataModalLabel' aria-hidden='true'>
+    <div class='modal fade' data-backdrop="static" wire:ignore.self id='formDataModal'
+        aria-labelledby='formDataModalLabel' aria-hidden='true'>
         <div class='modal-dialog'>
             <div class='modal-content'>
                 <div class='modal-header'>

@@ -7,6 +7,7 @@ use Livewire\Component;
 use App\Models\Persediaan;
 use Livewire\WithPagination;
 use Livewire\Attributes\Title;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 
 class StokOpname extends Component
@@ -38,11 +39,12 @@ class StokOpname extends Component
 
     private function getBukuFisik()
     {
-        $this->produks    = Produk::select('produk.id', 'nama_item', 'nama_cabang',  'stock')
+        $this->produks    = DB::table('produk')->select('produk.id', 'nama_item', 'nama_cabang', 'stock')
             ->join('cabang_lokasi', 'cabang_lokasi.id', 'produk.id_cabang')
+            ->whereIn('id_kategori', ['1', '4'])
             ->get();
 
-        $stock = $this->produks->first()->stock;
+        $stock = $this->produks->first()->stock ?? null;
         $this->buku       = $stock;
         $this->fisik      = $stock;
     }
@@ -59,14 +61,13 @@ class StokOpname extends Component
         $this->searchResetPage();
         $search = '%' . $this->searchTerm . '%';
 
-        $data = Persediaan::select('persediaan.id', 'persediaan.tanggal', 'persediaan.buku', 'persediaan.fisik', 'persediaan.selisih', 'persediaan.keterangan', 'cabang_lokasi.nama_cabang', 'produk.nama_item', 'users.name')
+        $data = DB::table('persediaan')->select('persediaan.id', 'persediaan.tanggal', 'persediaan.buku', 'persediaan.fisik', 'persediaan.selisih', 'persediaan.keterangan', 'cabang_lokasi.nama_cabang', 'produk.nama_item', 'users.name')
             ->join('cabang_lokasi', 'cabang_lokasi.id', 'persediaan.id_cabang')
             ->join('produk', 'produk.id', 'persediaan.id_produk')
             ->join('users', 'users.id', 'persediaan.id_user')
             ->where('persediaan.opname', 'yes')
             ->where(function ($query) use ($search) {
-                $query->where('nama_cabang', 'LIKE', $search);
-                $query->orWhere('nama_item', 'LIKE', $search);
+                $query->where('nama_item', 'LIKE', $search);
                 $query->orWhere('tanggal', 'LIKE', $search);
             })
             ->orderBy('id', 'ASC')
@@ -195,7 +196,7 @@ class StokOpname extends Component
 
     private function resetInputFields()
     {
-        $this->id_produk  = $this->produks->first()->id;
+        $this->id_produk  = $this->produks->first()->id ?? null;
         $this->tanggal    = date('Y-m-d');
         $this->keterangan = 'Stok Opname';
     }

@@ -26,14 +26,13 @@ class KartuStok extends Component
         $this->searchResetPage();
         $search = '%' . $this->searchTerm . '%';
 
-        $data = Persediaan::select('tanggal', 'nama_item', 'nama_cabang', 'persediaan.keterangan', 'persediaan.status', 'qty', DB::raw("SUM(CASE WHEN persediaan.status = 'Out' THEN -qty ELSE qty END) OVER(ORDER BY tanggal ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS balancing"))
+        $data = DB::table('persediaan')->select('tanggal', 'nama_item', 'nama_cabang', 'persediaan.keterangan', 'persediaan.status', 'qty', DB::raw("SUM(CASE WHEN persediaan.status = 'Out' THEN -qty ELSE qty END) OVER(PARTITION BY persediaan.id_cabang, persediaan.id_produk ORDER BY tanggal ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS balancing"))
             ->join('produk', 'produk.id', 'persediaan.id_produk')
             ->join('cabang_lokasi', 'cabang_lokasi.id', 'persediaan.id_cabang')
             ->where(function ($query) use ($search) {
                 $query->where('tanggal', 'LIKE', $search);
+                $query->orWhere('produk.nama_item', 'LIKE', $search);
                 $query->orWhere('persediaan.keterangan', 'LIKE', $search);
-                $query->orWhere('persediaan.status', 'LIKE', $search);
-                $query->orWhere('qty', 'LIKE', $search);
             })
             ->orderBy('tanggal', 'ASC')
             ->paginate($this->lengthData);

@@ -2,10 +2,20 @@
 
 namespace App\Livewire\DataPendukung;
 
-use App\Models\CabangLokasi as ModelsCabangLokasi;
 use Livewire\Component;
 use Livewire\WithPagination;
+use App\Models\KategoriProduk;
+use App\Models\KategoriSatuan;
 use Livewire\Attributes\Title;
+use App\Models\DaftarPelanggan;
+use App\Models\KategoriKeuangan;
+use App\Models\KategoriPembayaran;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+use App\Models\CabangLokasi as ModelsCabangLokasi;
+use App\Models\DaftarKaryawan;
+use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 
 class CabangLokasi extends Component
 {
@@ -51,7 +61,6 @@ class CabangLokasi extends Component
             ->where(function ($query) use ($search) {
                 $query->where('nama_cabang', 'LIKE', $search);
                 $query->orWhere('alamat', 'LIKE', $search);
-                $query->orWhere('status', 'LIKE', $search);
                 $query->orWhere('no_telp', 'LIKE', $search);
             })
             ->orderBy('id', 'ASC')
@@ -64,14 +73,186 @@ class CabangLokasi extends Component
     {
         $this->validate();
 
-        ModelsCabangLokasi::create([
-            'nama_cabang'         => $this->nama_cabang,
-            'alamat'              => $this->alamat,
-            'status'              => $this->status,
-            'no_telp'             => $this->no_telp,
-        ]);
+        DB::beginTransaction();
+        try {
+            $cabang = ModelsCabangLokasi::create([
+                'nama_cabang'         => $this->nama_cabang,
+                'alamat'              => $this->alamat,
+                'status'              => $this->status,
+                'no_telp'             => $this->no_telp,
+            ]);
 
-        $this->dispatchAlert('success', 'Success!', 'Data created successfully.');
+            // $this->createKategoriProduk($cabang->id);
+            // $this->createKategoriKeuangan($cabang->id);
+            // $this->createKategoriPembayaran($cabang->id);
+            // $this->createKategoriSatuan($cabang->id);
+            $this->createDaftarPelanggan($cabang->id);
+            $this->createDaftarKaryawan($cabang->id);
+
+            DB::commit();
+            $this->dispatchAlert('success', 'Success!', 'Data created successfully.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            $this->dispatchAlert('error', 'Gagal!', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
+    }
+
+    private function createKategoriProduk($id)
+    {
+        $kategori_produk = [
+            [
+                'id_cabang'           => $id,
+                'nama_kategori'       => 'Produk Barbershop',
+                'deskripsi'           => '',
+            ],
+            [
+                'id_cabang'           => $id,
+                'nama_kategori'       => 'Jasa Barbershop',
+                'deskripsi'           => '',
+            ],
+            [
+                'id_cabang'           => $id,
+                'nama_kategori'       => 'Treatment',
+                'deskripsi'           => '',
+            ],
+            [
+                'id_cabang'           => $id,
+                'nama_kategori'       => 'Produk Umum',
+                'deskripsi'           => '',
+            ],
+        ];
+
+        KategoriProduk::insert($kategori_produk);
+    }
+
+    private function createKategoriKeuangan($id)
+    {
+        $kategori_keuangan = [
+            [
+                'id_cabang'           => $id,
+                'nama_kategori'       => 'Pemasukan',
+                'kategori'            => 'Pemasukan',
+            ],
+
+            [
+                'id_cabang'           => $id,
+                'nama_kategori'       => 'Biaya Operasional',
+                'kategori'            => 'Pengeluaran',
+            ],
+        ];
+
+        KategoriKeuangan::insert($kategori_keuangan);
+    }
+
+    private function createKategoriPembayaran($id)
+    {
+        $kategori_pembayaran = [
+            [
+                'id_cabang'           => $id,
+                'nama_kategori'       => 'Tunai',
+                'deskripsi'           => '',
+            ],
+            [
+                'id_cabang'           => $id,
+                'nama_kategori'       => 'QRIS',
+                'deskripsi'           => '',
+            ],
+            [
+                'id_cabang'           => $id,
+                'nama_kategori'       => 'Transfer',
+                'deskripsi'           => '',
+            ],
+        ];
+
+        KategoriPembayaran::insert($kategori_pembayaran);
+    }
+
+    private function createKategoriSatuan($id)
+    {
+        $kategori_satuan = [
+            [
+                'id_cabang'           => $id,
+                'nama_satuan'         => 'Pcs',
+                'deskripsi'           => '',
+            ],
+            [
+                'id_cabang'           => $id,
+                'nama_satuan'         => 'Kali',
+                'deskripsi'           => '',
+            ],
+        ];
+
+        KategoriSatuan::insert($kategori_satuan);
+    }
+
+    private function createDaftarPelanggan($id_cabang)
+    {
+        DaftarPelanggan::create([
+            'id_user'        => Auth::user()->id,
+            'id_cabang'      => $id_cabang,
+            'nama_pelanggan' => "UMUM",
+            'no_telp'        => "62",
+            "deskripsi"      => "Pelanggan Umum",
+            "gambar"         => '-',
+        ]);
+    }
+
+    private function createDaftarKaryawan($id_cabang)
+    {
+        $users = [
+            [
+                'name' => 'Cabang ' . $id_cabang . ' - Admin',
+                'email' => 'cabang' . $id_cabang . '@admin.com',
+                'role_id' => 2, // ganti sesuai role_id aslinya
+            ],
+            [
+                'name' => 'Cabang ' . $id_cabang . ' - Kasir',
+                'email' => 'cabang' . $id_cabang . '@kasir.com',
+                'role_id' => 3,
+            ],
+            [
+                'name' => 'Cabang ' . $id_cabang . ' - Capster',
+                'email' => 'cabang' . $id_cabang . '@capster.com',
+                'role_id' => 4,
+            ],
+        ];
+
+        $roleMapping = [
+            "1"  => "direktur",
+            "2"  => "admin",
+            "3"  => "kasir",
+            "4"  => "capster",
+        ];
+
+        foreach ($users as $userData) {
+            $user = User::create([
+                'id_cabang' => $id_cabang,
+                'name' => $userData['name'],
+                'email' => $userData['email'],
+                'password' => Hash::make('1'),
+                'active' => 1,
+            ]);
+
+            // Assign role
+            DB::table('role_user')->insert([
+                'role_id' => $userData['role_id'],
+                'user_id' => $user->id,
+                'user_type' => 'App\Models\User',
+            ]);
+
+            // Insert ke daftar_karyawan
+            DaftarKaryawan::create([
+                'id_user'    => $user->id,
+                'id_cabang'  => $id_cabang,
+                'role_id'    => $roleMapping[$userData['role_id']],
+                'tgl_lahir'  => date('Y-m-d'),
+                'jk'         => '-',
+                'alamat'     => '-',
+                'no_telp'    => '62',
+                'deskripsi'  => '-',
+                'gambar'     => '-',
+            ]);
+        }
     }
 
     public function edit($id)
@@ -114,8 +295,22 @@ class CabangLokasi extends Component
 
     public function delete()
     {
-        ModelsCabangLokasi::findOrFail($this->dataId)->delete();
-        $this->dispatchAlert('success', 'Success!', 'Data deleted successfully.');
+        DB::beginTransaction();
+        try {
+            ModelsCabangLokasi::findOrFail($this->dataId)->delete();
+            // KategoriProduk::where('id_cabang', $this->dataId)->delete();
+            // KategoriKeuangan::where('id_cabang', $this->dataId)->delete();
+            // KategoriPembayaran::where('id_cabang', $this->dataId)->delete();
+            // KategoriSatuan::where('id_cabang', $this->dataId)->delete();
+            DaftarPelanggan::where('id_cabang', $this->dataId)->delete();
+            DaftarKaryawan::where('id_cabang', $this->dataId)->delete();
+
+            DB::commit();
+            $this->dispatchAlert('success', 'Success!', 'Data deleted successfully.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            $this->dispatchAlert('error', 'Gagal!', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
     }
 
     public function updatingLengthData()

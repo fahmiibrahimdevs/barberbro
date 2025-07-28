@@ -2,75 +2,72 @@
 
 namespace Database\Seeders;
 
+use App\Models\User;
 use App\Models\DaftarKaryawan;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
 class DaftarKaryawanSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        $data = [
-            [
-                'id_user'             => '',
-                'id_cabang'           => '',
-                'name'                => '',
-                'email'               => '',
-                'password'            => '',
-                'tgl_lahir'           => date('Y-m-d'),
-                'jk'                  => '',
-                'alamat'              => '',
-                'no_telp'             => '0',
-                'deskripsi'           => '',
-                'gambar'              => '',
-            ],
+        $id_cabang = 1;
 
+        $users = [
             [
-                'id_user'             => '',
-                'id_cabang'           => '',
-                'name'                => '',
-                'email'               => '',
-                'password'            => '',
-                'tgl_lahir'           => date('Y-m-d'),
-                'jk'                  => '',
-                'alamat'              => '',
-                'no_telp'             => '0',
-                'deskripsi'           => '',
-                'gambar'              => '',
+                'name' => 'Cabang ' . $id_cabang . ' - Admin',
+                'email' => 'cabang' . $id_cabang . '@admin.com',
+                'role_id' => 2, // admin
             ],
-
             [
-                'id_user'             => '',
-                'id_cabang'           => '',
-                'name'                => '',
-                'email'               => '',
-                'password'            => '',
-                'tgl_lahir'           => date('Y-m-d'),
-                'jk'                  => '',
-                'alamat'              => '',
-                'no_telp'             => '0',
-                'deskripsi'           => '',
-                'gambar'              => '',
+                'name' => 'Cabang ' . $id_cabang . ' - Kasir',
+                'email' => 'cabang' . $id_cabang . '@kasir.com',
+                'role_id' => 3, // kasir
             ],
-
             [
-                'id_user'             => '',
-                'id_cabang'           => '',
-                'name'                => '',
-                'email'               => '',
-                'password'            => '',
-                'tgl_lahir'           => date('Y-m-d'),
-                'jk'                  => '',
-                'alamat'              => '',
-                'no_telp'             => '0',
-                'deskripsi'           => '',
-                'gambar'              => '',
+                'name' => 'Cabang ' . $id_cabang . ' - Capster',
+                'email' => 'cabang' . $id_cabang . '@capster.com',
+                'role_id' => 4, // capster
             ],
         ];
 
-        DaftarKaryawan::insert($data);
+        $roleMapping = [
+            "1"  => "direktur",
+            "2"  => "admin",
+            "3"  => "kasir",
+            "4"  => "capster",
+        ];
+
+        foreach ($users as $userData) {
+            $user = User::create([
+                'id_cabang' => $id_cabang,
+                'name' => $userData['name'],
+                'email' => $userData['email'],
+                'password' => Hash::make('1'),
+                'active' => 1,
+            ]);
+
+            // Insert ke role_user
+            DB::table('role_user')->insert([
+                'role_id' => $userData['role_id'],
+                'user_id' => $user->id,
+                'user_type' => 'App\Models\User',
+            ]);
+
+            // Insert ke daftar_karyawan
+            DaftarKaryawan::create([
+                'id_user'    => $user->id,
+                'id_cabang'  => $id_cabang,
+                'role_id'    => $roleMapping[$userData['role_id']],
+                'tgl_lahir'  => date('Y-m-d'),
+                'jk'         => '-',
+                'alamat'     => '-',
+                'no_telp'    => '62',
+                'deskripsi'  => '-',
+                'gambar'     => '-',
+            ]);
+        }
     }
 }

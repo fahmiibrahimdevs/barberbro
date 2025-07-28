@@ -15,18 +15,22 @@ class KategoriProdukSeeder extends Seeder
     {
         $data = [
             [
+                // 'id_cabang'           => '1',
                 'nama_kategori'       => 'Produk Barbershop',
                 'deskripsi'           => '',
             ],
             [
+                // 'id_cabang'           => '1',
                 'nama_kategori'       => 'Jasa Barbershop',
                 'deskripsi'           => '',
             ],
             [
+                // 'id_cabang'           => '1',
                 'nama_kategori'       => 'Treatment',
                 'deskripsi'           => '',
             ],
             [
+                // 'id_cabang'           => '1',
                 'nama_kategori'       => 'Produk Umum',
                 'deskripsi'           => '',
             ],

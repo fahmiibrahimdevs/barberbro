@@ -20,8 +20,8 @@
                         <p class="show-entries-entries">Entries</p>
                     </div>
                     <div class="search-column">
-                        <p>Search: </p><input type="search" wire:model.live.debounce.750ms="searchTerm"
-                            id="search-data" placeholder="Search here..." class="form-control" value="">
+                        <p>Search: </p><input type="search" wire:model.live.debounce.750ms="searchTerm" id="search-data"
+                            placeholder="Search here..." class="form-control" value="">
                     </div>
                     <div class="table-responsive tw-max-h-96">
                         <table>
@@ -34,25 +34,24 @@
                             </thead>
                             <tbody>
                                 @forelse ($data as $row)
-                                    <tr>
-                                        <td class="text-center">{{ $loop->index + 1 }}</td>
-                                        <td>{{ $row->title }}</td>
-                                        <td class="text-center">
-                                            <button wire:click.prevent="edit({{ $row->id }})"
-                                                class="btn btn-primary" data-toggle="modal"
-                                                data-target="#formDataModal">
-                                                <i class="fas fa-edit"></i>
-                                            </button>
-                                            <button wire:click.prevent="deleteConfirm({{ $row->id }})"
-                                                class="btn btn-danger">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </td>
-                                    </tr>
+                                <tr>
+                                    <td class="text-center">{{ $loop->index + 1 }}</td>
+                                    <td>{{ $row->title }}</td>
+                                    <td class="text-center">
+                                        <button wire:click.prevent="edit({{ $row->id }})" class="btn btn-primary"
+                                            data-toggle="modal" data-target="#formDataModal">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button wire:click.prevent="deleteConfirm({{ $row->id }})"
+                                            class="btn btn-danger">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
                                 @empty
-                                    <tr>
-                                        <td colspan="3" class="text-center">Not data available in the table</td>
-                                    </tr>
+                                <tr>
+                                    <td colspan="3" class="text-center">Not data available in the table</td>
+                                </tr>
                                 @endforelse
                             </tbody>
                         </table>
@@ -68,7 +67,8 @@
             <i class="far fa-plus"></i>
         </button>
     </section>
-    <div class="modal fade" data-backdrop="static" wire:ignore.self id="formDataModal" aria-labelledby="formDataModalLabel" aria-hidden="true">
+    <div class="modal fade" data-backdrop="static" wire:ignore.self id="formDataModal"
+        aria-labelledby="formDataModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">

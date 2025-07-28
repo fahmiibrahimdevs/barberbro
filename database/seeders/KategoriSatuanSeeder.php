@@ -15,15 +15,13 @@ class KategoriSatuanSeeder extends Seeder
     {
         $data = [
             [
+                // 'id_cabang'           => '1',
                 'nama_satuan'         => 'Pcs',
                 'deskripsi'           => '',
             ],
             [
+                // 'id_cabang'           => '1',
                 'nama_satuan'         => 'Kali',
-                'deskripsi'           => '',
-            ],
-            [
-                'nama_satuan'         => 'Jam',
                 'deskripsi'           => '',
             ],
         ];

@@ -5,6 +5,8 @@ namespace App\Livewire\DataPendukung;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Livewire\Attributes\Title;
+use Illuminate\Support\Facades\DB;
+use App\Services\GlobalDataService;
 use App\Models\KategoriPembayaran as ModelsKategoriPembayaran;
 
 class KategoriPembayaran extends Component
@@ -13,12 +15,14 @@ class KategoriPembayaran extends Component
     #[Title('Kategori Pembayaran')]
 
     protected $paginationTheme = 'bootstrap';
+    protected $globalDataService;
 
     protected $listeners = [
         'delete'
     ];
 
     protected $rules = [
+        'id_cabang'         => 'required',
         'nama_kategori'       => 'required',
         'deskripsi'           => '',
     ];
@@ -29,11 +33,14 @@ class KategoriPembayaran extends Component
     public $isEditing = false;
 
     public $dataId;
+    public $cabangs;
+    public $id_cabang, $nama_kategori, $deskripsi;
 
-    public $nama_kategori, $deskripsi;
-
-    public function mount()
+    public function mount(GlobalDataService $globalDataService)
     {
+        $this->globalDataService   = $globalDataService;
+        // $this->cabangs             = $this->globalDataService->getCabangs();
+        // $this->id_cabang           = '';
         $this->nama_kategori       = '';
         $this->deskripsi           = '';
     }
@@ -43,7 +50,8 @@ class KategoriPembayaran extends Component
         $this->searchResetPage();
         $search = '%' . $this->searchTerm . '%';
 
-        $data = ModelsKategoriPembayaran::select('kategori_pembayaran.id', 'kategori_pembayaran.nama_kategori')
+        $data = DB::table('kategori_pembayaran')->select('kategori_pembayaran.id', 'kategori_pembayaran.nama_kategori')
+            // ->join('cabang_lokasi', 'kategori_pembayaran.id_cabang', '=', 'cabang_lokasi.id')
             ->where(function ($query) use ($search) {
                 $query->where('nama_kategori', 'LIKE', $search);
                 // $query->orWhere('deskripsi', 'LIKE', $search);
@@ -59,6 +67,7 @@ class KategoriPembayaran extends Component
         $this->validate();
 
         ModelsKategoriPembayaran::create([
+            // 'id_cabang'       => $this->id_cabang,
             'nama_kategori'       => $this->nama_kategori,
             'deskripsi'           => $this->deskripsi,
         ]);
@@ -68,9 +77,11 @@ class KategoriPembayaran extends Component
 
     public function edit($id)
     {
+        $this->initSelect2();
         $this->isEditing        = true;
         $data = ModelsKategoriPembayaran::where('id', $id)->first();
         $this->dataId           = $id;
+        // $this->id_cabang    = $data->id_cabang;
         $this->nama_kategori    = $data->nama_kategori;
         // $this->deskripsi        = $data->deskripsi;
     }
@@ -81,6 +92,7 @@ class KategoriPembayaran extends Component
 
         if ($this->dataId) {
             ModelsKategoriPembayaran::findOrFail($this->dataId)->update([
+                // 'id_cabang'       => $this->id_cabang,
                 'nama_kategori'       => $this->nama_kategori,
                 // 'deskripsi'           => $this->deskripsi,
             ]);
@@ -134,10 +146,22 @@ class KategoriPembayaran extends Component
     public function isEditingMode($mode)
     {
         $this->isEditing = $mode;
+        $this->initSelect2();
+    }
+
+    public function initSelect2()
+    {
+        $this->dispatch('initSelect2');
+    }
+
+    public function updated()
+    {
+        $this->initSelect2();
     }
 
     private function resetInputFields()
     {
+        // $this->id_cabang           = '';
         $this->nama_kategori       = '';
         $this->deskripsi           = '';
     }

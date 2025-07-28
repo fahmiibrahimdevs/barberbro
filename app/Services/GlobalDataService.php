@@ -39,6 +39,11 @@ class GlobalDataService
         return DB::table('daftar_pelanggan')->select('id', 'nama_pelanggan')->get();
     }
 
+    public function getPelanggansCustom($id_cabang)
+    {
+        return DB::table('daftar_pelanggan')->select('id', 'nama_pelanggan')->where('id_cabang', $id_cabang)->get();
+    }
+
     public function getKaryawans()
     {
         return DB::table('daftar_karyawan')->select('daftar_karyawan.id', 'name')
@@ -47,10 +52,37 @@ class GlobalDataService
             ->get();
     }
 
+    public function getKaryawansCustom($id_cabang)
+    {
+        return DB::table('daftar_karyawan')->select('daftar_karyawan.id', 'name')
+            ->join('users', 'users.id', 'daftar_karyawan.id_user')
+            ->where('role_id', 'capster')
+            ->where('daftar_karyawan.id_cabang', $id_cabang)
+            ->get();
+    }
+
     public function getProdukAndKategori()
     {
         return DB::table('produk')->select('produk.id', 'nama_item', 'harga_jasa', 'nama_kategori', 'produk.deskripsi')
             ->join('kategori_produk', 'kategori_produk.id', 'produk.id_kategori')
             ->get();
+    }
+
+    public function getProdukAndKategoriCustom($id_cabang)
+    {
+        return DB::table('produk')->select('produk.id', 'nama_item', 'harga_jasa', 'nama_kategori', 'produk.deskripsi')
+            ->join('kategori_produk', 'kategori_produk.id', 'produk.id_kategori')
+            ->where('produk.id_cabang', $id_cabang)
+            ->get();
+    }
+
+    public function getMetodePembayaran()
+    {
+        return DB::table('kategori_pembayaran')->select('id', 'nama_kategori')->get();
+    }
+
+    public function getKategoriKeuangan()
+    {
+        return DB::table('kategori_keuangan')->select('id', 'nama_kategori');
     }
 }

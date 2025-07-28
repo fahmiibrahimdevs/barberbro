@@ -18,9 +18,12 @@ class DatabaseSeeder extends Seeder
             AdministratorSeeder::class,
             CabangLokasiSeeder::class,
             KategoriProdukSeeder::class,
-            KategoriPengeluaranSeeder::class,
+            // KategoriPengeluaranSeeder::class,
             KategoriPembayaranSeeder::class,
-            KategoriSatuanSeeder::class
+            KategoriSatuanSeeder::class,
+            KategoriKeuanganSeeder::class,
+            DaftarKaryawanSeeder::class,
+            DaftarPelangganSeeder::class,
         ]);
     }
 }

@@ -27,7 +27,7 @@ class DaftarKaryawan extends Component
         'id_cabang'           => 'required',
         'role_id'             => 'required',
         'name'                => 'required',
-        'email'               => 'required',
+        'email'               => 'required|email|unique:users',
         'password'            => '',
         'tgl_lahir'           => '',
         'jk'                  => '-',
@@ -85,6 +85,7 @@ class DaftarKaryawan extends Component
         try {
             // Simpan user
             $user = User::create([
+                'id_cabang'         => $this->id_cabang,
                 'name'              => $this->name,
                 'email'             => $this->email,
                 'email_verified_at' => null,
@@ -141,11 +142,26 @@ class DaftarKaryawan extends Component
 
     public function update()
     {
-        $this->validate();
+        $data = ModelsDaftarKaryawan::findOrFail($this->dataId);
+        $userId = $data->id_user;
+
+        $this->validate([
+            'id_cabang'           => 'required',
+            'role_id'             => 'required',
+            'name'                => 'required',
+            'email'                => 'required|email|unique:users,email,' . $userId,
+            'password'            => '',
+            'tgl_lahir'           => '',
+            'jk'                  => '-',
+            'alamat'              => '',
+            'no_telp'             => '',
+            'deskripsi'           => '',
+            'gambar'              => '',
+        ]);
+
         DB::beginTransaction();
 
         try {
-
             $roleMapping = [
                 "direktur"  => "1",
                 "admin"     => "2",
@@ -154,13 +170,13 @@ class DaftarKaryawan extends Component
             ];
 
             if ($this->dataId) {
-                $data = ModelsDaftarKaryawan::findOrFail($this->dataId);
                 $user = User::findOrFail($data->id_user);
 
                 // Update user name & email saja
                 $user->update([
-                    'name'  => $this->name,
-                    'email' => $this->email,
+                    'id_cabang' => $this->id_cabang,
+                    'name'      => $this->name,
+                    'email'     => $this->email,
                 ]);
 
                 DB::table('role_user')

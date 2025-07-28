@@ -2,25 +2,29 @@
 
 namespace App\Livewire\DataPendukung;
 
-use App\Models\KategoriPengeluaran as ModelsKategoriPengeluaran;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Livewire\Attributes\Title;
+use Illuminate\Support\Facades\DB;
+use App\Models\KategoriKeuangan as ModelsKategoriKeuangan;
+use App\Services\GlobalDataService;
 
-class KategoriPengeluaran extends Component
+class KategoriKeuangan extends Component
 {
     use WithPagination;
-    #[Title('Kategori Pengeluaran')]
+    #[Title('Kategori Keuangan')]
 
     protected $paginationTheme = 'bootstrap';
+    protected $globalDataService;
 
     protected $listeners = [
         'delete'
     ];
 
     protected $rules = [
+        'id_cabang'         => 'required',
         'nama_kategori'       => 'required',
-        'deskripsi'           => '',
+        'kategori'            => 'required',
     ];
 
     public $lengthData = 25;
@@ -29,13 +33,16 @@ class KategoriPengeluaran extends Component
     public $isEditing = false;
 
     public $dataId;
+    // public $cabangs;
+    public $id_cabang, $nama_kategori, $kategori;
 
-    public $nama_kategori, $deskripsi;
-
-    public function mount()
+    public function mount(GlobalDataService $globalDataService)
     {
+        $this->globalDataService   = $globalDataService;
+        // $this->cabangs             = $this->globalDataService->getCabangs();
+        // $this->id_cabang           = '';
         $this->nama_kategori       = '';
-        $this->deskripsi           = '';
+        $this->kategori            = '';
     }
 
     public function render()
@@ -43,24 +50,26 @@ class KategoriPengeluaran extends Component
         $this->searchResetPage();
         $search = '%' . $this->searchTerm . '%';
 
-        $data = ModelsKategoriPengeluaran::select('kategori_pengeluaran.id', 'kategori_pengeluaran.nama_kategori')
+        $data = DB::table('kategori_keuangan')->select('kategori_keuangan.*')
+            // ->join('cabang_lokasi', 'kategori_keuangan.id_cabang', '=', 'cabang_lokasi.id')
             ->where(function ($query) use ($search) {
                 $query->where('nama_kategori', 'LIKE', $search);
-                // $query->orWhere('deskripsi', 'LIKE', $search);
+                $query->orWhere('kategori', 'LIKE', $search);
             })
             ->orderBy('id', 'ASC')
             ->paginate($this->lengthData);
 
-        return view('livewire.data-pendukung.kategori-pengeluaran', compact('data'));
+        return view('livewire.data-pendukung.kategori-keuangan', compact('data'));
     }
 
     public function store()
     {
         $this->validate();
 
-        ModelsKategoriPengeluaran::create([
+        ModelsKategoriKeuangan::create([
+            // 'id_cabang'       => $this->id_cabang,
             'nama_kategori'       => $this->nama_kategori,
-            'deskripsi'           => $this->deskripsi,
+            'kategori'            => $this->kategori,
         ]);
 
         $this->dispatchAlert('success', 'Success!', 'Data created successfully.');
@@ -68,11 +77,13 @@ class KategoriPengeluaran extends Component
 
     public function edit($id)
     {
+        $this->initSelect2();
         $this->isEditing        = true;
-        $data = ModelsKategoriPengeluaran::where('id', $id)->first();
+        $data = ModelsKategoriKeuangan::where('id', $id)->first();
         $this->dataId           = $id;
+        // $this->id_cabang    = $data->id_cabang;
         $this->nama_kategori    = $data->nama_kategori;
-        // $this->deskripsi        = $data->deskripsi;
+        $this->kategori         = $data->kategori;
     }
 
     public function update()
@@ -80,9 +91,10 @@ class KategoriPengeluaran extends Component
         $this->validate();
 
         if ($this->dataId) {
-            ModelsKategoriPengeluaran::findOrFail($this->dataId)->update([
+            ModelsKategoriKeuangan::findOrFail($this->dataId)->update([
+                // 'id_cabang'       => $this->id_cabang,
                 'nama_kategori'       => $this->nama_kategori,
-                // 'deskripsi'           => $this->deskripsi,
+                'kategori'            => $this->kategori,
             ]);
 
             $this->dispatchAlert('success', 'Success!', 'Data updated successfully.');
@@ -102,7 +114,7 @@ class KategoriPengeluaran extends Component
 
     public function delete()
     {
-        ModelsKategoriPengeluaran::findOrFail($this->dataId)->delete();
+        ModelsKategoriKeuangan::findOrFail($this->dataId)->delete();
         $this->dispatchAlert('success', 'Success!', 'Data deleted successfully.');
     }
 
@@ -134,12 +146,23 @@ class KategoriPengeluaran extends Component
     public function isEditingMode($mode)
     {
         $this->isEditing = $mode;
+        $this->initSelect2();
+    }
+
+    public function initSelect2()
+    {
+        $this->dispatch('initSelect2');
+    }
+
+    public function updated()
+    {
+        $this->initSelect2();
     }
 
     private function resetInputFields()
     {
+        // $this->id_cabang           = '';
         $this->nama_kategori       = '';
-        $this->deskripsi           = '';
     }
 
     public function cancel()

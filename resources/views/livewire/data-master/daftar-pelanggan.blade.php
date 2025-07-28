@@ -28,7 +28,7 @@
                             <thead class='tw-sticky tw-top-0'>
                                 <tr class='tw-text-gray-700'>
                                     <th width='6%' class='text-center'>No</th>
-                                    <th class='tw-whitespace-nowrap'>Nama Lengkap</th>
+                                    <th class='tw-whitespace-nowrap'>Nama Pelanggan</th>
                                     <th class='tw-whitespace-nowrap'>No. Telepon</th>
                                     <th class='tw-whitespace-nowrap'>Deskripsi</th>
                                     <th class='tw-whitespace-nowrap'>Pembuat</th>
@@ -44,11 +44,12 @@
                                 </tr>
                                 @foreach ($row as $result)
                                 <tr class='text-center'>
-                                    <td class='tw-whitespace-nowrap'>{{ $loop->index + 1 }}</td>
+                                    <td class='tw-whitespace-nowrap'>
+                                        {{ ($data->currentPage() - 1) * $data->perPage() + $loop->iteration }}</td>
                                     <td class='tw-whitespace-nowrap text-left tw-flex tw-items-center'>
                                         <img src="{{ asset('assets/stisla/img/avatar/avatar-1.png') }}"
                                             class="tw-rounded-full tw-w-8 tw-h-8 tw-mr-3">
-                                        {{ $result['nama_lengkap'] }}
+                                        {{ $result['nama_pelanggan'] }}
                                     </td>
                                     <td class='tw-whitespace-nowrap text-left'>{{ $result['no_telp'] }}</td>
                                     <td class='tw-whitespace-nowrap text-left'>{{ $result['deskripsi'] }}</td>
@@ -85,7 +86,8 @@
         </button>
     </section>
 
-    <div class='modal fade' data-backdrop="static" wire:ignore.self id='formDataModal' aria-labelledby='formDataModalLabel' aria-hidden='true'>
+    <div class='modal fade' data-backdrop="static" wire:ignore.self id='formDataModal'
+        aria-labelledby='formDataModalLabel' aria-hidden='true'>
         <div class='modal-dialog'>
             <div class='modal-content'>
                 <div class='modal-header'>
@@ -109,9 +111,9 @@
                             @error('id_cabang') <span class='text-danger'>{{ $message }}</span> @enderror
                         </div>
                         <div class='form-group'>
-                            <label for='nama_lengkap'>Nama Lengkap</label>
-                            <input type='text' wire:model='nama_lengkap' id='nama_lengkap' class='form-control'>
-                            @error('nama_lengkap') <span class='text-danger'>{{ $message }}</span> @enderror
+                            <label for='nama_pelanggan'>Nama Pelanggan</label>
+                            <input type='text' wire:model='nama_pelanggan' id='nama_pelanggan' class='form-control'>
+                            @error('nama_pelanggan') <span class='text-danger'>{{ $message }}</span> @enderror
                         </div>
                         <div class='form-group'>
                             <label for='no_telp'>No. Telepon</label>

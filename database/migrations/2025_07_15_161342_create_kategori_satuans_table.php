@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('kategori_satuan', function (Blueprint $table) {
             $table->id();
+            // $table->text('id_cabang')->default('');
             $table->text('nama_satuan')->default('');
             $table->text('deskripsi')->default('');
         });

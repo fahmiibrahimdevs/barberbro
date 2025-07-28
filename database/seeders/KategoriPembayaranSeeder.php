@@ -15,34 +15,17 @@ class KategoriPembayaranSeeder extends Seeder
     { {
             $data = [
                 [
+                    // 'id_cabang'           => '1',
                     'nama_kategori'       => 'Tunai',
                     'deskripsi'           => '',
                 ],
                 [
-                    'nama_kategori'       => 'GoPay',
-                    'deskripsi'           => '',
-                ],
-                [
-                    'nama_kategori'       => 'Dana',
-                    'deskripsi'           => '',
-                ],
-                [
-                    'nama_kategori'       => 'ShopeePay',
-                    'deskripsi'           => '',
-                ],
-                [
+                    // 'id_cabang'           => '1',
                     'nama_kategori'       => 'QRIS',
                     'deskripsi'           => '',
                 ],
                 [
-                    'nama_kategori'       => 'LinkAja',
-                    'deskripsi'           => '',
-                ],
-                [
-                    'nama_kategori'       => 'OVO',
-                    'deskripsi'           => '',
-                ],
-                [
+                    // 'id_cabang'           => '1',
                     'nama_kategori'       => 'Transfer',
                     'deskripsi'           => '',
                 ],

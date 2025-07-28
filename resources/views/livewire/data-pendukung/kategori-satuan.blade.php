@@ -29,7 +29,6 @@
                                 <tr class='tw-text-gray-700'>
                                     <th width='6%' class='text-center'>No</th>
                                     <th class='tw-whitespace-nowrap'>Nama Satuan</th>
-                                    <th class='tw-whitespace-nowrap'>Deskripsi</th>
                                     <th class='text-center'><i class='fas fa-cog'></i></th>
                                 </tr>
                             </thead>
@@ -38,7 +37,6 @@
                                 <tr class='text-center'>
                                     <td class='tw-whitespace-nowrap'>{{ $loop->index + 1 }}</td>
                                     <td class='tw-whitespace-nowrap text-left'>{{ $row->nama_satuan }}</td>
-                                    <td class='tw-whitespace-nowrap text-left'>{{ $row->deskripsi }}</td>
                                     <td class='tw-whitespace-nowrap'>
                                         <button wire:click.prevent='edit({{ $row->id }})' class='btn btn-primary'
                                             data-toggle='modal' data-target='#formDataModal'>
@@ -70,7 +68,8 @@
         </button>
     </section>
 
-    <div class='modal fade' data-backdrop="static" wire:ignore.self id='formDataModal' aria-labelledby='formDataModalLabel' aria-hidden='true'>
+    <div class='modal fade' data-backdrop="static" wire:ignore.self id='formDataModal'
+        aria-labelledby='formDataModalLabel' aria-hidden='true'>
         <div class='modal-dialog'>
             <div class='modal-content'>
                 <div class='modal-header'>

@@ -14,17 +14,21 @@ return new class extends Migration
         Schema::create('transaksi', function (Blueprint $table) {
             $table->id();
             $table->text('id_cabang')->nullable();
+            $table->text('id_user')->nullable();
             $table->text('no_transaksi')->nullable();
             $table->text('tanggal')->nullable();
             $table->text('id_pelanggan')->nullable();
-            $table->text('id_karyawan')->nullable();
-            $table->text('total_komisi_karyawan')->nullable();
-            $table->text('sub_total')->nullable();
-            $table->text('total_akhir')->nullable();
-            $table->text('id_metode_pembayaran')->nullable();
-            $table->text('dibayar')->nullable();
-            $table->text('kembalian')->nullable();
             $table->text('catatan')->nullable();
+            $table->text('total_pesanan')->nullable();
+            $table->text('total_komisi_karyawan')->nullable();
+            $table->text('total_sub_total')->nullable();
+            $table->text('total_diskon')->nullable();
+            $table->text('total_akhir')->nullable();
+            $table->text('laba_bersih')->nullable();
+            $table->text('id_metode_pembayaran')->nullable();
+            $table->text('jumlah_dibayarkan')->nullable();
+            $table->text('kembalian')->nullable();
+            $table->enum('status', ['booking', 'belum lunas', 'lunas', 'dibatalkan'])->default('lunas');
             $table->timestamps();
         });
     }

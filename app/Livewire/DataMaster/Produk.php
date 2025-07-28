@@ -3,11 +3,7 @@
 namespace App\Livewire\DataMaster;
 
 use Livewire\Component;
-use App\Models\CabangLokasi;
 use Livewire\WithPagination;
-use App\Models\DaftarKaryawan;
-use App\Models\KategoriProduk;
-use App\Models\KategoriSatuan;
 use Livewire\Attributes\Title;
 use Illuminate\Support\Facades\DB;
 use App\Services\GlobalDataService;
@@ -35,6 +31,7 @@ class Produk extends Component
         'kode_item'           => '',
         'nama_item'           => 'required',
         'harga_jasa'          => '',
+        'komisi'              => 'required|integer',
         'harga_pokok'         => '',
         'harga_jual'          => '',
         'stock'               => '',
@@ -50,7 +47,7 @@ class Produk extends Component
     public $dataId;
     public $cabangs, $kategoris, $satuans, $karyawans;
     public $dataKategoris, $komisi_karyawan, $komisi_karyawan_awal = [];
-    public $isKomisi = false, $total_karyawan;
+    public $isKomisi, $isProdukUmum = false, $total_karyawan;
     public $id_cabang, $id_user, $id_kategori, $id_satuan, $kode_item, $nama_item, $harga_jasa, $komisi, $harga_pokok, $harga_jual, $stock, $deskripsi, $gambar;
 
     // Menggunakan mount untuk inject service
@@ -64,7 +61,8 @@ class Produk extends Component
         $this->kategoris  = $this->globalDataService->getKategoris();
         $this->satuans    = $this->globalDataService->getSatuans();
 
-        $this->karyawans = $this->globalDataService->getKaryawans();
+        $this->karyawans = $this->globalDataService->getKaryawansCustom($this->id_cabang ?? $this->cabangs->first()->id);
+        // dd($this->karyawans);
 
         // Init komisi_karyawan default kosong
         foreach ($this->karyawans as $karyawan) {
@@ -78,9 +76,22 @@ class Produk extends Component
         $this->resetInputFields();
     }
 
+    public function updatedIdCabang(GlobalDataService $globalDataService)
+    {
+        $this->karyawans = $globalDataService->getKaryawansCustom($this->id_cabang);
+    }
+
     public function updatedIdKategori()
     {
-        $this->id_kategori == "1" ? $this->isKomisi = true : $this->isKomisi = false;
+        if (in_array($this->id_kategori, ['1', '4'])) {
+            $this->id_satuan = 1;
+            $this->isKomisi = true;
+        } else {
+            $this->id_satuan = 2;
+            $this->isKomisi = false;
+        }
+
+        $this->id_kategori == "4" ? $this->isProdukUmum = true : $this->isProdukUmum = false;
         // dd($this->isKomisi);
     }
 
@@ -89,21 +100,32 @@ class Produk extends Component
         $this->searchResetPage();
         $search = '%' . $this->searchTerm . '%';
 
-        $this->total_karyawan = DB::table('daftar_karyawan')->where('role_id', 'capster')->count();
+        $this->total_karyawan = DB::table('daftar_karyawan')
+            ->select('id_cabang', DB::raw('COUNT(*) as total'))
+            ->where('role_id', 'capster')
+            ->groupBy('id_cabang')
+            ->pluck('total', 'id_cabang') // hasil: [id_cabang => total]
+            ->toArray();
+
         $komisi_data = DB::table('komisi')
             ->select('id_produk', DB::raw('count(*) as jumlah_komisi'))
-            ->whereNotNull('komisi_persen')
+            ->where(function ($q) {
+                $q->whereNotNull('komisi_persen')
+                    ->where('komisi_persen', '!=', 0)
+                    ->where('komisi_persen', '!=', '');
+            })
             ->groupBy('id_produk')
             ->pluck('jumlah_komisi', 'id_produk')
             ->toArray();
 
-        $data = ModelsProduk::select('produk.id', 'produk.nama_item', 'produk.harga_jasa', 'produk.komisi', 'produk.stock', 'produk.deskripsi', 'produk.gambar', 'cabang_lokasi.nama_cabang', 'kategori_produk.nama_kategori', 'kategori_satuan.nama_satuan')
+        $data = DB::table('produk')->select('produk.id', 'produk.id_cabang', 'produk.nama_item', 'produk.harga_jasa', 'produk.komisi', 'produk.stock', 'produk.deskripsi', 'produk.gambar', 'cabang_lokasi.nama_cabang', 'kategori_produk.nama_kategori', 'kategori_satuan.nama_satuan')
             ->leftJoin('cabang_lokasi', 'cabang_lokasi.id', 'produk.id_cabang')
             ->leftJoin('kategori_produk', 'kategori_produk.id', 'produk.id_kategori')
             ->leftJoin('kategori_satuan', 'kategori_satuan.id', 'produk.id_satuan')
             ->where(function ($query) use ($search) {
-                $query->where('nama_kategori', 'LIKE', $search);
-                $query->orWhere('nama_item', 'LIKE', $search);
+                // $query->where('nama_kategori', 'LIKE', $search);
+                $query->where('nama_item', 'LIKE', $search);
+                $query->orWhere('produk.deskripsi', 'LIKE', $search);
             })
             ->orderBy('nama_kategori', 'ASC')
             ->paginate($this->lengthData);
@@ -126,6 +148,7 @@ class Produk extends Component
                 'kode_item'    => $this->kode_item,
                 'nama_item'    => $this->nama_item,
                 'harga_jasa'   => $this->harga_jasa,
+                'komisi'       => $this->komisi,
                 'harga_pokok'  => $this->harga_pokok,
                 'harga_jual'   => $this->harga_jual,
                 'stock'        => $this->stock,
@@ -158,7 +181,7 @@ class Produk extends Component
         }
     }
 
-    public function edit($id)
+    public function edit(GlobalDataService $globalDataService, $id)
     {
         $this->isEditing        = true;
         $this->dispatch('initSelect2');
@@ -179,8 +202,13 @@ class Produk extends Component
         $this->gambar           = $data->gambar;
         $this->updatedIdKategori();
 
+        $this->karyawans = $globalDataService->getKaryawansCustom($this->id_cabang);
+
         // 🟡 Ambil komisi dari pivot dan isi ke $komisi_karyawan
         $komisi = DB::table('komisi')
+            ->join('daftar_karyawan', 'komisi.id_karyawan', '=', 'daftar_karyawan.id')
+            ->where('id_cabang', $this->id_cabang)
+            ->select('komisi.*')
             ->where('id_produk', $id)
             ->get();
 
@@ -200,9 +228,8 @@ class Produk extends Component
             try {
                 // 1. Update data produk
                 ModelsProduk::findOrFail($this->dataId)->update([
-                    'id_cabang'           => $this->id_cabang,
+                    // 'id_cabang'           => $this->id_cabang,
                     'id_user'             => Auth::user()->id,
-                    'id_kategori'         => $this->id_kategori,
                     'id_satuan'           => $this->id_satuan,
                     // 'kode_item'           => $this->kode_item,
                     'nama_item'           => $this->nama_item,
@@ -323,12 +350,14 @@ class Produk extends Component
         $this->kode_item           = NULL;
         $this->nama_item           = '';
         $this->harga_jasa          = '0';
-        $this->komisi              = NULL;
+        $this->komisi              = '0';
         $this->harga_pokok         = NULL;
         $this->harga_jual          = NULL;
         $this->stock               = '0';
         $this->deskripsi           = '-';
         $this->gambar              = NULL;
+
+        $this->komisi_karyawan     = [];
     }
 
     public function cancel()

@@ -7,6 +7,7 @@ use Livewire\Component;
 use App\Models\Persediaan;
 use Livewire\WithPagination;
 use Livewire\Attributes\Title;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 
 class StokKeluar extends Component
@@ -37,8 +38,9 @@ class StokKeluar extends Component
 
     public function mount()
     {
-        $this->produks    = Produk::select('produk.id', 'nama_item', 'nama_cabang')
+        $this->produks    = DB::table('produk')->select('produk.id', 'nama_item', 'nama_cabang')
             ->join('cabang_lokasi', 'cabang_lokasi.id', 'produk.id_cabang')
+            ->whereIn('id_kategori', ['1', '4'])
             ->get();
 
         $this->resetInputFields();
@@ -49,14 +51,13 @@ class StokKeluar extends Component
         $this->searchResetPage();
         $search = '%' . $this->searchTerm . '%';
 
-        $data = Persediaan::select('persediaan.id', 'persediaan.tanggal', 'persediaan.qty', 'persediaan.keterangan', 'cabang_lokasi.nama_cabang', 'produk.nama_item', 'users.name')
+        $data = DB::table('persediaan')->select('persediaan.id', 'persediaan.tanggal', 'persediaan.qty', 'persediaan.keterangan', 'cabang_lokasi.nama_cabang', 'produk.nama_item', 'users.name')
             ->join('cabang_lokasi', 'cabang_lokasi.id', 'persediaan.id_cabang')
             ->join('produk', 'produk.id', 'persediaan.id_produk')
             ->join('users', 'users.id', 'persediaan.id_user')
             ->where('persediaan.status', 'Out')
             ->where(function ($query) use ($search) {
-                $query->where('nama_cabang', 'LIKE', $search);
-                $query->orWhere('nama_item', 'LIKE', $search);
+                $query->where('nama_item', 'LIKE', $search);
                 $query->orWhere('tanggal', 'LIKE', $search);
             })
             ->orderBy('id', 'ASC')
@@ -260,7 +261,7 @@ class StokKeluar extends Component
 
     private function resetInputFields()
     {
-        $this->id_produk           = $this->produks->first()->id;
+        $this->id_produk           = $this->produks->first()->id ?? null;
         $this->tanggal             = date('Y-m-d');
         $this->qty                 = '';
         $this->keterangan          = 'Stok Keluar';

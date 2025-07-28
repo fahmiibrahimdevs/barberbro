@@ -36,10 +36,12 @@
                             <tbody>
                                 @forelse ($data as $row)
                                 <tr class='text-center'>
-                                    <td class='tw-whitespace-nowrap'>{{ $loop->index + 1 }}</td>
+                                    <td class='tw-py-4 tw-whitespace-nowrap'>{{ $loop->index + 1 }}</td>
                                     <td class='tw-whitespace-nowrap text-left'>{{ $row->nama_kategori }}</td>
                                     {{-- <td class='tw-whitespace-nowrap text-left'>{{ $row->deskripsi }}</td> --}}
+
                                     <td class='tw-whitespace-nowrap'>
+                                        @if (!in_array($row->id, ["1","2","3", "4"]))
                                         <button wire:click.prevent='edit({{ $row->id }})' class='btn btn-primary'
                                             data-toggle='modal' data-target='#formDataModal'>
                                             <i class='fas fa-edit'></i>
@@ -48,6 +50,7 @@
                                             class='btn btn-danger'>
                                             <i class='fas fa-trash'></i>
                                         </button>
+                                        @endif
                                     </td>
                                 </tr>
                                 @empty
@@ -64,13 +67,14 @@
                 </div>
             </div>
         </div>
-        <button wire:click.prevent='isEditingMode(false)' class='btn-modal' data-toggle='modal' data-backdrop='static'
+        {{-- <button wire:click.prevent='isEditingMode(false)' class='btn-modal' data-toggle='modal' data-backdrop='static'
             data-keyboard='false' data-target='#formDataModal'>
             <i class='far fa-plus'></i>
-        </button>
+        </button> --}}
     </section>
 
-    <div class='modal fade' data-backdrop="static" wire:ignore.self id='formDataModal' aria-labelledby='formDataModalLabel' aria-hidden='true'>
+    <div class='modal fade' data-backdrop="static" wire:ignore.self id='formDataModal'
+        aria-labelledby='formDataModalLabel' aria-hidden='true'>
         <div class='modal-dialog'>
             <div class='modal-content'>
                 <div class='modal-header'>

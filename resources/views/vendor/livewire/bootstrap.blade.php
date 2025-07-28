@@ -1,12 +1,12 @@
 <div>
     @if ($paginator->hasPages())
     <nav class="tw-block tw-text-center lg:tw-flex">
-        <div class="tw-mt-5 tw-mb-5 lg:tw-mb-0">
+        <div class="tw-mt-5 tw-mb-5 lg:tw-mb-0 lg:tw-mt-6">
             Showing {{ ($paginator->currentPage() - 1) * $paginator->perPage() + 1 }}
             to {{ ($paginator->currentPage() - 1) * $paginator->perPage() + count($paginator->items()) }}
             of {{ $paginator->total() }} entries
         </div>
-        <ul class="pagination tw-justify-center lg:tw-ml-auto">
+        <ul class="pagination tw-justify-center tw-mt-0 lg:tw-ml-auto lg:tw-mt-4">
             {{-- Previous Page Link --}}
             @if ($paginator->onFirstPage())
             <li class="page-item disabled" aria-disabled="true" aria-label="@lang('pagination.previous')">

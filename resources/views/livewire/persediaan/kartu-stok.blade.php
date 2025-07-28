@@ -23,7 +23,7 @@
                         <p>Search: </p><input type='search' wire:model.live.debounce.750ms='searchTerm' id='search-data'
                             placeholder='Search here...' class='form-control'>
                     </div>
-                    <div class='table-responsive tw-max-h-96 no-scrollbar'>
+                    <div class='table-responsive tw-max-h-full no-scrollbar'>
                         <table class='tw-w-full tw-table-auto'>
                             <thead class='tw-sticky tw-top-0'>
                                 <tr class='tw-text-gray-700'>
@@ -48,55 +48,55 @@
                                 @forelse ($data->groupBy('nama_cabang') as $row)
                                 <tr>
                                     <td class="tw-text-sm tw-tracking-wider" colspan="10">
-                                        <b>Lokasi: {{ $row[0]['nama_cabang'] }}</b>
+                                        <b>Lokasi: {{ $row[0]->nama_cabang }}</b>
                                     </td>
                                 </tr>
                                 @foreach ($row->groupBy('nama_item') as $result)
                                 <tr>
                                     <td class="tw-text-sm tw-tracking-wider tw-pl-10" colspan="10">
-                                        <b>Produk: <span class="text-primary">{{ $result[0]['nama_item'] }}</span></b>
+                                        <b>Produk: <span class="text-primary">{{ $result[0]->nama_item }}</span></b>
                                     </td>
                                 </tr>
                                 @foreach ($result as $results)
                                 <tr class='text-center'>
-                                    <td class='tw-p-3 tw-whitespace-nowrap text-left tw-pl-16'>{{ $results['tanggal'] }}
+                                    <td class='tw-p-3 tw-whitespace-nowrap text-left tw-pl-16'>{{ $results->tanggal }}
                                     </td>
-                                    <td class='tw-p-3 tw-whitespace-nowrap text-left'>{{ $results['keterangan'] }}</td>
+                                    <td class='tw-p-3 tw-whitespace-nowrap text-left'>{{ $results->keterangan }}</td>
                                     <td class='tw-p-3 tw-whitespace-nowrap text-center'>
-                                        @if ($results['status'] == 'Balance')
+                                        @if ($results->status == 'Balance')
                                         @php
-                                        $amountBalance += $results['qty'];
+                                        $amountBalance += $results->qty;
                                         @endphp
-                                        {{ $results['qty'] }},00
+                                        @stock($results->qty)
                                         @else
                                         -
                                         @endif
                                     </td>
                                     <td class='tw-p-3 tw-whitespace-nowrap text-center'>
-                                        @if ($results['status'] == 'In')
+                                        @if ($results->status == 'In')
                                         @php
-                                        $amountIn += $results['qty'];
+                                        $amountIn += $results->qty;
                                         @endphp
-                                        {{ $results['qty'] }},00
+                                        @stock($results->qty)
                                         @else
                                         -
                                         @endif
                                     </td>
                                     <td class='tw-p-3 tw-whitespace-nowrap text-center'>
-                                        @if ($results['status'] == 'Out')
+                                        @if ($results->status == 'Out')
                                         @php
-                                        $amountOut += $results['qty'];
+                                        $amountOut += $results->qty;
                                         @endphp
-                                        {{ $results['qty'] }},00
+                                        @stock($results->qty)
                                         @else
                                         -
                                         @endif
                                     </td>
                                     <td class='tw-p-3 tw-whitespace-nowrap text-center'>
                                         @php
-                                        $amountBalanceLast = last((array)$results['balancing']);
+                                        $amountBalanceLast = last((array)$results->balancing);
                                         @endphp
-                                        {{ $results['balancing'] }},00
+                                        @stock($results->balancing)
                                     </td>
                                 </tr>
                                 @endforeach

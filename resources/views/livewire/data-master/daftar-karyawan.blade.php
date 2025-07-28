@@ -50,7 +50,8 @@
                                 </tr>
                                 @foreach ($row as $result)
                                 <tr class='text-center'>
-                                    <td class='tw-whitespace-nowrap'>{{ $loop->index + 1 }}</td>
+                                    <td class='tw-whitespace-nowrap'>
+                                        {{ ($data->currentPage() - 1) * $data->perPage() + $loop->iteration }}</td>
                                     <td class='tw-whitespace-nowrap text-left'>{{ $result['role_id'] }}</td>
                                     <td class='tw-whitespace-nowrap text-left tw-flex tw-items-center'>
                                         <img src="{{ asset('assets/stisla/img/avatar/avatar-1.png') }}"
@@ -74,7 +75,7 @@
                                 @endforeach
                                 @empty
                                 <tr>
-                                    <td colspan='6' class='text-center'>No data available in the table</td>
+                                    <td colspan='7' class='text-center'>No data available in the table</td>
                                 </tr>
                                 @endforelse
                             </tbody>
@@ -94,7 +95,8 @@
         </button>
     </section>
 
-    <div class='modal fade' data-backdrop="static" wire:ignore.self id='formDataModal' aria-labelledby='formDataModalLabel' aria-hidden='true'>
+    <div class='modal fade' data-backdrop="static" wire:ignore.self id='formDataModal'
+        aria-labelledby='formDataModalLabel' aria-hidden='true'>
         <div class='modal-dialog'>
             <div class='modal-content'>
                 <div class='modal-header'>

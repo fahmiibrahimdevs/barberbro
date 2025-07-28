@@ -15,39 +15,12 @@ class DaftarPelangganSeeder extends Seeder
     {
         $data = [
             [
-                'id_user'             => '',
-                'id_cabang'           => '',
-                'nama_lengkap'        => '0',
-                'no_telp'             => '0',
-                'deskripsi'           => '',
-                'gambar'              => '',
-            ],
-
-            [
-                'id_user'             => '',
-                'id_cabang'           => '',
-                'nama_lengkap'        => '0',
-                'no_telp'             => '0',
-                'deskripsi'           => '',
-                'gambar'              => '',
-            ],
-
-            [
-                'id_user'             => '',
-                'id_cabang'           => '',
-                'nama_lengkap'        => '0',
-                'no_telp'             => '0',
-                'deskripsi'           => '',
-                'gambar'              => '',
-            ],
-
-            [
-                'id_user'             => '',
-                'id_cabang'           => '',
-                'nama_lengkap'        => '0',
-                'no_telp'             => '0',
-                'deskripsi'           => '',
-                'gambar'              => '',
+                'id_user'             => '1',
+                'id_cabang'           => '1',
+                'nama_pelanggan'      => 'UMUM',
+                'no_telp'             => '62',
+                'deskripsi'           => 'Pelanggan Umum',
+                'gambar'              => '-',
             ],
         ];
 

@@ -40,23 +40,24 @@
                                 @forelse ($data->groupBy('nama_cabang') as $row)
                                 <tr>
                                     <td class="tw-text-sm tw-tracking-wider" colspan="7">
-                                        <b>Lokasi: {{ $row[0]['nama_cabang'] }}</b>
+                                        <b>Lokasi: {{ $row[0]->nama_cabang }}</b>
                                     </td>
                                 </tr>
                                 @foreach ($row as $result)
                                 <tr class='text-center'>
-                                    <td class='tw-whitespace-nowrap'>{{ $loop->index + 1 }}</td>
-                                    <td class='tw-whitespace-nowrap text-left'>{{ $result['tanggal'] }}</td>
-                                    <td class='tw-whitespace-nowrap text-left'>{{ $result['nama_item'] }}</td>
-                                    <td class='tw-whitespace-nowrap text-left'>{{ $result['qty'] }}</td>
-                                    <td class='tw-whitespace-nowrap text-left'>{{ $result['keterangan'] }}</td>
-                                    <td class='tw-whitespace-nowrap text-left'>{{ $result['name'] }}</td>
                                     <td class='tw-whitespace-nowrap'>
-                                        <button wire:click.prevent='edit({{ $result['id'] }})' class='btn btn-primary'
+                                        {{ ($data->currentPage() - 1) * $data->perPage() + $loop->iteration }}</td>
+                                    <td class='tw-whitespace-nowrap text-left'>{{ $result->tanggal }}</td>
+                                    <td class='tw-whitespace-nowrap text-left'>{{ $result->nama_item }}</td>
+                                    <td class='tw-whitespace-nowrap text-left'>@stock($result->qty)</td>
+                                    <td class='tw-whitespace-nowrap text-left'>{{ $result->keterangan }}</td>
+                                    <td class='tw-whitespace-nowrap text-left'>{{ $result->name }}</td>
+                                    <td class='tw-whitespace-nowrap'>
+                                        <button wire:click.prevent='edit({{ $result->id }})' class='btn btn-primary'
                                             data-toggle='modal' data-target='#formDataModal'>
                                             <i class='fas fa-edit'></i>
                                         </button>
-                                        <button wire:click.prevent='deleteConfirm({{ $result['id'] }})'
+                                        <button wire:click.prevent='deleteConfirm({{ $result->id }})'
                                             class='btn btn-danger'>
                                             <i class='fas fa-trash'></i>
                                         </button>
@@ -83,7 +84,8 @@
         </button>
     </section>
 
-    <div class='modal fade' data-backdrop="static" wire:ignore.self id='formDataModal' aria-labelledby='formDataModalLabel' aria-hidden='true'>
+    <div class='modal fade' data-backdrop="static" wire:ignore.self id='formDataModal'
+        aria-labelledby='formDataModalLabel' aria-hidden='true'>
         <div class='modal-dialog'>
             <div class='modal-content'>
                 <div class='modal-header'>
@@ -98,11 +100,10 @@
                             <label for='id_produk'>Nama Produk</label>
                             <div wire:ignore>
                                 <select wire:model='id_produk' id='id_produk' class='form-control select2'>
-                                    @foreach ($produks->groupBy('nama_cabang') as $produk)
-                                    <optgroup label="{{ $produk[0]['nama_cabang'] }}">
-                                        @foreach ($produk as $detailProduk)
-                                        <option value='{{ $detailProduk['id'] }}'>{{ $detailProduk['nama_item'] }}
-                                        </option>
+                                    @foreach ($produks->groupBy('nama_cabang') as $produkGroup)
+                                    <optgroup label="{{ $produkGroup->first()->nama_cabang }}">
+                                        @foreach ($produkGroup as $detailProduk)
+                                        <option value="{{ $detailProduk->id }}">{{ $detailProduk->nama_item }}</option>
                                         @endforeach
                                     </optgroup>
                                     @endforeach
