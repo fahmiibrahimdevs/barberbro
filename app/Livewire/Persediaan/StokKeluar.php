@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Persediaan;
 
+use Carbon\Carbon;
 use App\Models\Produk;
 use Livewire\Component;
 use App\Models\Persediaan;
@@ -60,6 +61,7 @@ class StokKeluar extends Component
                 $query->where('nama_item', 'LIKE', $search);
                 $query->orWhere('tanggal', 'LIKE', $search);
             })
+            ->whereBetween('persediaan.tanggal', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()])
             ->orderBy('id', 'ASC')
             ->paginate($this->lengthData);
 

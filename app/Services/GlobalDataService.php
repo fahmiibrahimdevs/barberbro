@@ -46,9 +46,9 @@ class GlobalDataService
 
     public function getKaryawans()
     {
-        return DB::table('daftar_karyawan')->select('daftar_karyawan.id', 'name')
+        return DB::table('daftar_karyawan')->select('daftar_karyawan.id', 'name', 'nama_cabang')
+            ->join('cabang_lokasi', 'cabang_lokasi.id', 'daftar_karyawan.id_cabang')
             ->join('users', 'users.id', 'daftar_karyawan.id_user')
-            ->where('role_id', 'capster')
             ->get();
     }
 

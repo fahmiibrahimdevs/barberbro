@@ -124,8 +124,10 @@
                                 data-toggle='modal' data-target='#formDataModal'><i class="fas fa-edit"></i></button>
                             <button wire:click.prevent='deleteConfirm({{ $row->id }})' class="btn btn-danger"><i
                                     class="fas fa-trash"></i></button>
-                            <button class="btn btn-info"><i class="fas fa-print"></i></button>
-                            <button class="btn btn-success"><i class="fab fa-whatsapp"></i></button>
+                            <a target="_BLANK" href="{{ url('/transaksi/print-nota/'.\Crypt::encrypt($row->id)) }}"
+                                class="btn btn-info" title="Cetak Struk"><i class="fas fa-print"></i></a>
+                            <a target="_BLANK" href="{{ url('https://wa.me/'.$row->no_telp) }}"
+                                class="btn btn-success"><i class="fab fa-whatsapp"></i></a>
                         </div>
                     </div>
                 </div>
@@ -566,6 +568,12 @@
             $('#formCartItemsModal').modal('hide')
         });
     })
+    // window.addEventListener('printNota', function (idTransaksi) {
+    //     console.log('Print Nota:', event.detail);
+    //     const id = event.detail.id; // ambil dari event.detail
+
+    //     window.open('/transaksi/print-nota/' + id, '_blank');
+    // });
 
 </script>
 @endpush

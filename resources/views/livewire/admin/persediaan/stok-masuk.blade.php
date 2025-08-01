@@ -23,7 +23,7 @@
                         <p>Search: </p><input type='search' wire:model.live.debounce.750ms='searchTerm' id='search-data'
                             placeholder='Search here...' class='form-control'>
                     </div>
-                    <div class='table-responsive tw-max-h-96 no-scrollbar'>
+                    <div class='table-responsive no-scrollbar'>
                         <table class='tw-w-full tw-table-auto'>
                             <thead class='tw-sticky tw-top-0'>
                                 <tr class='tw-text-gray-700'>

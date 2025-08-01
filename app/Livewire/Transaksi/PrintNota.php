@@ -1,20 +1,27 @@
 <?php
 
-namespace App\Livewire;
+namespace App\Livewire\Transaksi;
 
 use Livewire\Component;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Redirect;
 
-class Test extends Component
+class PrintNota extends Component
 {
     public $id_cabang, $id_transaksi;
     public $cabang, $transaksi, $detailTransaksis;
 
-    public function mount()
+    public function mount($id_transaksi)
     {
+        try {
+            $this->id_transaksi = Crypt::decrypt($id_transaksi);
+        } catch (\Exception $e) {
+            // ID tidak bisa didekripsi, redirect ke halaman utama
+            return Redirect::to('/dashboard');
+        }
         $this->id_cabang    = Auth::user()->id_cabang;
-        $this->id_transaksi = 1;
 
         $this->cabang = DB::table('cabang_lokasi')->select('id', 'nama_cabang', 'alamat', 'no_telp', 'email')->where('id', $this->id_cabang)->first();
 
@@ -32,6 +39,6 @@ class Test extends Component
 
     public function render()
     {
-        return view('livewire.test')->layout('components.layouts.test');
+        return view('livewire.transaksi.print-nota')->layout('components.layouts.test');
     }
 }

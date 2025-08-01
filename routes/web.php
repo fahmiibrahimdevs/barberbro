@@ -23,12 +23,15 @@ use App\Livewire\DataPendukung\KategoriPembayaran;
 use App\Livewire\DataPendukung\KategoriProduk;
 use App\Livewire\DataPendukung\KategoriSatuan;
 use App\Livewire\Keuangan\CashOnBank;
+use App\Livewire\Keuangan\Kasbon;
+use App\Livewire\Keuangan\SlipGaji;
 use App\Livewire\Persediaan\KartuStok;
 use App\Livewire\Persediaan\SaldoAwalItem;
 use App\Livewire\Persediaan\StokKeluar;
 use App\Livewire\Persediaan\StokMasuk;
 use App\Livewire\Persediaan\StokOpname;
 use App\Livewire\Test;
+use App\Livewire\Transaksi\PrintNota;
 use App\Livewire\Transaksi\Transaksi;
 
 Route::get('/', [AuthenticatedSessionController::class, 'create'])
@@ -59,8 +62,11 @@ Route::group(['middleware' => ['auth', 'role:direktur']], function () {
     Route::get('/persediaan/kartu-stok', KartuStok::class);
 
     Route::get('/keuangan/cash-on-bank', CashOnBank::class);
+    Route::get('/keuangan/kasbon', Kasbon::class);
+    Route::get('/keuangan/slip-gaji', SlipGaji::class);
 
     Route::get('/transaksi', Transaksi::class);
+    Route::get('/transaksi/print-nota/{id_transaksi}', PrintNota::class);
     // Route::get('/example', Example::class);
     Route::get('/pengaturan/control-user', ControlUser::class);
 });

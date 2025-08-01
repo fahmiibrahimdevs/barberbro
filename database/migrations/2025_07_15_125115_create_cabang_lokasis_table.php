@@ -13,10 +13,14 @@ return new class extends Migration
     {
         Schema::create('cabang_lokasi', function (Blueprint $table) {
             $table->id();
-            $table->text('nama_cabang');
-            $table->text('alamat')->default('');
+            $table->text('nama_cabang')->nullable('');
+            $table->text('subtitle_cabang')->nullable('');
+            $table->text('alamat')->nullable('');
+            $table->text('no_telp')->nullable('');
+            $table->text('email')->nullable('');
+            $table->text('syarat_nota_1')->nullable('');
+            $table->text('template_pesan_pembayaran')->nullable('');
             $table->enum('status', ['aktif', 'nonaktif'])->default('aktif');
-            $table->text('no_telp')->default('');
         });
     }
 

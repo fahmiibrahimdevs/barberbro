@@ -42,14 +42,18 @@ class CabangLokasi extends Component
 
     public $dataId;
 
-    public $nama_cabang, $alamat, $status, $no_telp;
+    public $nama_cabang, $subtitle_cabang, $alamat, $email, $syarat_nota_1, $template_pesan_pembayaran, $status, $no_telp;
 
     public function mount()
     {
-        $this->nama_cabang         = '';
-        $this->alamat              = '';
-        $this->status              = '';
-        $this->no_telp             = '';
+        $this->nama_cabang                  = NULL;
+        $this->subtitle_cabang              = NULL;
+        $this->alamat                       = NULL;
+        $this->email                        = NULL;
+        $this->syarat_nota_1                = NULL;
+        $this->template_pesan_pembayaran    = NULL;
+        $this->status                       = NULL;
+        $this->no_telp                      = NULL;
     }
 
     public function render()
@@ -257,13 +261,17 @@ class CabangLokasi extends Component
 
     public function edit($id)
     {
-        $this->isEditing        = true;
+        $this->isEditing                    = true;
         $data = ModelsCabangLokasi::where('id', $id)->first();
-        $this->dataId           = $id;
-        $this->nama_cabang      = $data->nama_cabang;
-        $this->alamat           = $data->alamat;
-        $this->status           = $data->status;
-        $this->no_telp          = $data->no_telp;
+        $this->dataId                       = $id;
+        $this->nama_cabang                  = $data->nama_cabang;
+        $this->subtitle_cabang              = $data->subtitle_cabang;
+        $this->alamat                       = $data->alamat;
+        $this->email                        = $data->email;
+        $this->syarat_nota_1                = $data->syarat_nota_1;
+        $this->template_pesan_pembayaran    = $data->template_pesan_pembayaran;
+        $this->status                       = $data->status;
+        $this->no_telp                      = $data->no_telp;
     }
 
     public function update()
@@ -272,10 +280,14 @@ class CabangLokasi extends Component
 
         if ($this->dataId) {
             ModelsCabangLokasi::findOrFail($this->dataId)->update([
-                'nama_cabang'         => $this->nama_cabang,
-                'alamat'              => $this->alamat,
-                'status'              => $this->status,
-                'no_telp'             => $this->no_telp,
+                'nama_cabang'               => $this->nama_cabang,
+                'subtitle_cabang'           => $this->subtitle_cabang,
+                'alamat'                    => $this->alamat,
+                'email'                     => $this->email,
+                'syarat_nota_1'             => $this->syarat_nota_1,
+                'template_pesan_pembayaran' => $this->template_pesan_pembayaran,
+                'status'                    => $this->status,
+                'no_telp'                   => $this->no_telp,
             ]);
 
             $this->dispatchAlert('success', 'Success!', 'Data updated successfully.');

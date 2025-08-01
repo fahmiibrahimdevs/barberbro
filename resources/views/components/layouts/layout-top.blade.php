@@ -335,6 +335,26 @@
                 }
             })
         })
+        window.addEventListener('swal:transaksi', function (event) {
+            const {
+                idTransaksi,
+                message,
+                text
+            } = event.detail[0];
+
+            Swal.fire({
+                title: message,
+                text: text,
+                icon: 'success',
+                showCancelButton: true,
+                cancelButtonText: 'Tidak',
+                confirmButtonText: 'Ya, Cetak Struk',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.open('/transaksi/print-nota/' + idTransaksi, '_blank');
+                }
+            });
+        });
         window.onbeforeunload = function () {
             window.scrollTo(5, 75);
         };

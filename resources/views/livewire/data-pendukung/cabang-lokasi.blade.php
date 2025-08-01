@@ -92,12 +92,39 @@
                             <input type='text' wire:model='nama_cabang' id='nama_cabang' class='form-control'>
                             @error('nama_cabang') <span class='text-danger'>{{ $message }}</span> @enderror
                         </div>
+                        @if ($isEditing)
+                        <div class='form-group'>
+                            <label for='subtitle_cabang'>Subtitle Cabang</label>
+                            <input type='text' wire:model='subtitle_cabang' id='subtitle_cabang' class='form-control'>
+                            @error('subtitle_cabang') <span class='text-danger'>{{ $message }}</span> @enderror
+                        </div>
+                        @endif
                         <div class='form-group'>
                             <label for='alamat'>Alamat</label>
                             <textarea wire:model='alamat' id='alamat' class='form-control'
                                 style='height: 100px !important;'></textarea>
                             @error('alamat') <span class='text-danger'>{{ $message }}</span> @enderror
                         </div>
+                        @if ($isEditing)
+                        <div class='form-group'>
+                            <label for='email'>Email</label>
+                            <input type='text' wire:model='email' id='email' class='form-control'>
+                            @error('email') <span class='text-danger'>{{ $message }}</span> @enderror
+                        </div>
+                        <div class='form-group'>
+                            <label for='syarat_nota_1'>Syarat Nota 1</label>
+                            <textarea wire:model='syarat_nota_1' id='syarat_nota_1' class='form-control'
+                                style='height: 100px !important;'></textarea>
+                            @error('syarat_nota_1') <span class='text-danger'>{{ $message }}</span> @enderror
+                        </div>
+                        <div class='form-group'>
+                            <label for='template_pesan_pembayaran'>Template Pesan Pembayaran</label>
+                            <textarea wire:model='template_pesan_pembayaran' id='template_pesan_pembayaran'
+                                class='form-control' style='height: 100px !important;'></textarea>
+                            @error('template_pesan_pembayaran') <span class='text-danger'>{{ $message }}</span>
+                            @enderror
+                        </div>
+                        @endif
                         <div class='form-group'>
                             <label for='status'>Status</label>
                             <select wire:model='status' id='status' class='form-control'>

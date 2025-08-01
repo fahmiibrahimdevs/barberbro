@@ -15,10 +15,15 @@ class CabangLokasiSeeder extends Seeder
     {
         $data = [
             [
-                'nama_cabang'         => 'CheckPoint Barbershop',
-                'alamat'              => 'Jl. Otto Iskandardinata, Karanganyar, Kec. Subang, Kabupaten Subang, Jawa Barat',
-                'status'              => 'aktif',
-                'no_telp'             => '085216003456',
+                'nama_cabang'               => 'CheckPoint Barbershop',
+                'subtitle_cabang'           => '',
+                'alamat'                    => 'Jl. Otto Iskandardinata, Karanganyar, Kec. Subang, Kabupaten Subang, Jawa Barat',
+                'email'                     => '',
+                'syarat_nota_1'             => '',
+                'template_pesan_pembayaran' => '',
+                'subtitle_cabang'           => '',
+                'status'                    => 'aktif',
+                'no_telp'                   => '085216003456',
             ],
             // [
             //     'nama_cabang'         => 'CheckPoint Barbershop II',

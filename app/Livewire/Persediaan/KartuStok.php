@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Persediaan;
 
+use Carbon\Carbon;
 use Livewire\Component;
 use App\Models\Persediaan;
 use Livewire\WithPagination;
@@ -34,6 +35,7 @@ class KartuStok extends Component
                 $query->orWhere('produk.nama_item', 'LIKE', $search);
                 $query->orWhere('persediaan.keterangan', 'LIKE', $search);
             })
+            ->whereBetween('persediaan.tanggal', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()])
             ->orderBy('tanggal', 'ASC')
             ->paginate($this->lengthData);
 

@@ -68,7 +68,7 @@ class DaftarKaryawan extends Component
             ->where(function ($query) use ($search) {
                 $query->where('name', 'LIKE', $search);
                 $query->orWhere('role_id', 'LIKE', $search);
-                $query->orWhere('email', 'LIKE', $search);
+                $query->orWhere('users.email', 'LIKE', $search);
                 $query->orWhere('daftar_karyawan.no_telp', 'LIKE', $search);
             })
             ->orderBy('id', 'ASC')

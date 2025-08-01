@@ -11,6 +11,7 @@ use App\Models\TransaksiCounter;
 use Illuminate\Support\Facades\DB;
 use App\Services\GlobalDataService;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Crypt;
 use App\Models\Transaksi as ModelsTransaksi;
 
 class Transaksi extends Component
@@ -77,7 +78,7 @@ class Transaksi extends Component
         $this->searchResetPage();
         $search = '%' . $this->searchTerm . '%';
 
-        $data = DB::table('transaksi')->select('transaksi.id', 'transaksi.no_transaksi', 'transaksi.tanggal', 'daftar_pelanggan.nama_pelanggan',  'transaksi.total_akhir', 'transaksi.status', 'detail.nama_item', 'detail.deskripsi_item', 'jumlah.jumlah_produk', 'kategori_pembayaran.nama_kategori', 'cabang_lokasi.nama_cabang')
+        $data = DB::table('transaksi')->select('transaksi.id', 'transaksi.no_transaksi', 'transaksi.tanggal', 'daftar_pelanggan.nama_pelanggan', 'daftar_pelanggan.no_telp',  'transaksi.total_akhir', 'transaksi.status', 'detail.nama_item', 'detail.deskripsi_item', 'jumlah.jumlah_produk', 'kategori_pembayaran.nama_kategori', 'cabang_lokasi.nama_cabang')
             ->join('daftar_pelanggan', 'daftar_pelanggan.id', 'transaksi.id_pelanggan')
             ->join('kategori_pembayaran', 'kategori_pembayaran.id', 'transaksi.id_metode_pembayaran')
             ->join('cabang_lokasi', 'cabang_lokasi.id', 'transaksi.id_cabang')
@@ -101,6 +102,7 @@ class Transaksi extends Component
             ->when($this->filter_pembayaran, function ($query) {
                 $query->where('transaksi.id_metode_pembayaran', $this->filter_pembayaran);
             })
+            ->whereBetween('transaksi.tanggal', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()])
             ->orderBy('id', 'DESC')
             ->orderBy('transaksi.id_cabang', 'ASC')
             ->paginate($this->lengthData);
@@ -160,8 +162,10 @@ class Transaksi extends Component
 
             DetailTransaksi::insert($detailData);
             DB::commit();
-            $this->dispatchAlert('success', 'Success!', 'Transaksi berhasil disimpan.');
+            $this->dispatchSwalTransaksi($transaksi->id);
+            $this->resetInputFields();
             $this->dispatch('closePembayaranModal');
+            $this->dispatch('printNota', id: $transaksi->id);
         } catch (\Exception $e) {
             DB::rollBack();
             $this->dispatchAlert('error', 'Gagal!', 'Terjadi kesalahan: ' . $e->getMessage());
@@ -286,7 +290,7 @@ class Transaksi extends Component
             }
 
             DB::commit();
-            $this->dispatchAlert('success', 'Success!', 'Transaksi berhasil diperbarui.');
+            $this->dispatchSwalTransaksi($transaksi->id);
             $this->dataId = null;
             $this->dispatch('closePembayaranModal');
         } catch (\Exception $e) {
@@ -334,6 +338,15 @@ class Transaksi extends Component
         ]);
 
         $this->resetInputFields();
+    }
+
+    private function dispatchSwalTransaksi($idTransaksi)
+    {
+        $this->dispatch('swal:transaksi', [
+            'idTransaksi' => Crypt::encrypt($idTransaksi), // enkripsi ID,
+            'message'     => 'Transaksi berhasil!',
+            'text'        => 'Apakah kamu ingin mencetak struk sekarang?',
+        ]);
     }
 
     public function updatedIdCabang(GlobalDataService $globalDataService)

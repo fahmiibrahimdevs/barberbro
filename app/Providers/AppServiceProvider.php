@@ -24,6 +24,10 @@ class AppServiceProvider extends ServiceProvider
             return "Rp<?php echo number_format($amount, 0, ',', '.'); ?>";
         });
 
+        Blade::directive('price', function ($amount) {
+            return "<?php echo number_format($amount, 0, ',', '.'); ?>";
+        });
+
         Blade::directive('stock', function ($quantity) {
             return "<?php echo $quantity?>,00";
         });
