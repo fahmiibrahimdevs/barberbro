@@ -23,7 +23,7 @@
                         <p>Search: </p><input type='search' wire:model.live.debounce.750ms='searchTerm' id='search-data'
                             placeholder='Search here...' class='form-control'>
                     </div>
-                    <div class='table-responsive tw-max-h-96 no-scrollbar'>
+                    <div class='table-responsive no-scrollbar'>
                         <table class='tw-w-full tw-table-auto'>
                             <thead class='tw-sticky tw-top-0'>
                                 <tr class='tw-text-gray-700'>
@@ -31,34 +31,65 @@
                                     <th class='tw-whitespace-nowrap'>Periode</th>
                                     <th class='tw-whitespace-nowrap'>Nama Karyawan</th>
                                     <th class='tw-whitespace-nowrap'>Total Gaji</th>
-                                    <th class='tw-whitespace-nowrap'>Status</th>
+                                    <th width="5%" class='tw-whitespace-nowrap'>Status</th>
                                     <th class='text-center'><i class='fas fa-cog'></i></th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @forelse ($data as $row)
+                                @forelse ($data->groupBy('nama_cabang') as $result)
+                                <tr>
+                                    <td class="tw-text-sm tw-tracking-wider" colspan="10">
+                                        <b>Lokasi: {{ $result[0]->nama_cabang }}</b>
+                                    </td>
+                                </tr>
+                                @foreach ($result as $row)
                                 <tr class='text-center'>
                                     <td class='tw-whitespace-nowrap'>{{ $loop->index + 1 }}</td>
-                                    <td class='tw-whitespace-nowrap text-left'>{{ $row->periode_mulai }} -
+                                    <td class='tw-whitespace-nowrap text-left'>{{ $row->periode_mulai }} <span
+                                            class="tw-text-gray-600">s/d</span>
                                         {{ $row->periode_selesai }}</td>
                                     <td class='tw-whitespace-nowrap text-left'>{{ $row->nama_karyawan }}</td>
-                                    <td class='tw-whitespace-nowrap text-left'>{{ $row->total_gaji }}</td>
-                                    <td class='tw-whitespace-nowrap text-left'>{{ $row->status }}</td>
+                                    <td class='tw-whitespace-nowrap text-left'>@money($row->total_gaji)</td>
+                                    <td class='tw-whitespace-nowrap text-left'>
+                                        @if ($row->status == "final")
+                                        <p
+                                            class="tw-bg-green-100 tw-text-green-600 tw-tracking-[0.5px] tw-font-semibold tw-py-0.5 tw-px-3 tw-text-center tw-rounded-md">
+                                            Final</p>
+                                        @else
+                                        <p
+                                            class="tw-bg-red-100 tw-text-red-600 tw-tracking-[0.5px] tw-font-semibold tw-text-sm tw-py-1 tw-px-3 tw-text-center tw-rounded-md">
+                                            Draft</p>
+                                        @endif
+                                    </td>
                                     <td class='tw-whitespace-nowrap'>
-                                        <a target="_BLANK" href="#" class='btn btn-primary'>
+                                        <a target="_BLANK" href="#" class='btn btn-info'>
                                             <i class='fas fa-print'></i>
                                         </a>
+                                        <button wire:click.prevent="edit({{ $row->id }})" class="btn btn-primary"
+                                            data-toggle="modal" data-target="#formDataModal">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
                                         <button wire:click.prevent='deleteConfirm({{ $row->id }})'
                                             class='btn btn-danger'>
                                             <i class='fas fa-trash'></i>
                                         </button>
                                     </td>
                                 </tr>
+                                @endforeach
+                                {{-- Tambahkan ini untuk total gaji per cabang --}}
+                                <tr>
+                                    <td colspan="3" class="tw-font-bold text-right text-black">Total Gaji Keseluruhan:
+                                    </td>
+                                    <td class="tw-font-bold text-left">@money($result->sum('total_gaji'))</td>
+                                    <td colspan="2"></td>
+                                </tr>
                                 @empty
                                 <tr>
                                     <td colspan='6' class='text-center'>No data available in the table</td>
                                 </tr>
+
                                 @endforelse
+
                             </tbody>
                         </table>
                     </div>
@@ -209,16 +240,18 @@
     </div>
     <div class="modal fade !tw-pr-[0px] sm:tw-pr-[0px]" data-backdrop="static" wire:ignore.self id="reviewModal"
         aria-labelledby="reviewModalLabel" aria-hidden="true">
-        <div class='modal-dialog tw-w-full tw-m-0 sm:tw-w-auto sm:tw-m-[1.75rem_auto] tw-overflow-y-[initial]'>
+        <div class='modal-dialog tw-w-full tw-m-0 sm:tw-w-auto sm:tw-m-[1.75rem_auto] tw-overflow-y-[auto]'>
             <div class='modal-content tw-rounded-none lg:tw-rounded-md'>
                 <div class="modal-header tw-px-4 lg:tw-px-6 tw-sticky tw-top-[0] tw-bg-white tw-z-50">
                     <h5 class="modal-title tw-font-bold " id="reviewModalLabel">Slip Gaji</h5>
-                    <button type="button" wire:click="cancel()" class="close" data-dismiss="modal" aria-label="Close">
+                    <button type="button" wire:click="cancelReview()" class="close" data-dismiss="modal"
+                        aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <form>
-                    <div class="modal-body tw-text-[#34395e] tw-px-2 lg:tw-px-4">
+                    <div
+                        class="modal-body tw-text-[#34395e] tw-px-2 lg:tw-px-4 tw-max-h-[calc(100vh-200px)] tw-overflow-y-auto tw-overflow-x-hidden no-scrollbar">
                         <div class="tw-text-center">
                             <h2 class="tw-text-xl tw-font-semibold">Barber shop</h2>
                             <p>{{ $nama_karyawan ?? "-" }}</p>
@@ -236,7 +269,7 @@
                                         {{ \Carbon\Carbon::parse($row_komisi->tanggal)->format('d M Y, H:i') }}</p>
                                     <p class="tw-text-blue-800">{{ $row_komisi->no_transaksi }}</p>
                                 </div>
-                                <p class="sm:tw-text-sm">+@money($row_komisi->komisi_nominal)</p>
+                                <p class="sm:tw-text-sm">@money($row_komisi->komisi_nominal)</p>
                             </div>
                             <hr>
 
@@ -255,7 +288,7 @@
                             @forelse ($tunjangans as $tunjangan)
                             <div class="tw-flex tw-items-center tw-justify-between tw-mt-1">
                                 <p class="tw-text-sm">{{ $tunjangan['nama_komponen'] ?: '-' }}</p>
-                                <p class="tw-text-sm">+@money($tunjangan['jumlah'])</p>
+                                <p class="tw-text-sm">@money($tunjangan['jumlah'])</p>
                             </div>
                             @empty
                             <p class="tw-text-sm tw-text-gray-500 tw-my-1">Tidak ada tunjangan</p>
@@ -276,10 +309,12 @@
                             @forelse ($potongans as $potongan)
                             <div class="tw-flex tw-text-sm tw-items-center tw-justify-between tw-mt-1">
                                 <p>{{ $potongan['nama_komponen'] ?: '-' }}</p>
-                                <p>-@money($potongan['jumlah'])</p>
+                                <p>@money($potongan['jumlah'])</p>
                             </div>
                             @empty
+                            @if ($total_kasbon == 0)
                             <p class="tw-text-sm tw-text-gray-500 tw-my-1">Tidak ada potongan</p>
+                            @endif
                             @endforelse
                             @if ($total_kasbon > 0)
                             <div class="tw-flex tw-text-sm tw-items-center tw-justify-between tw-mt-1">
@@ -303,7 +338,7 @@
                             <p class="">Total</p>
                             <p class="tw-font-semibold tw-text-lg">@money($total_gaji)</p>
                         </div>
-                        <button wire:click.prevent="store()"
+                        <button wire:click.prevent="{{ $isEditing ? 'update()' : 'store()' }}"
                             class="btn btn-primary tw-bg-blue-500 form-control tw-py-2">Simpan</button>
                     </div>
                 </form>
@@ -363,6 +398,30 @@
             backdrop: 'static',
             keyboard: false
         }).modal('show');
+    });
+
+    window.addEventListener('swal:slipgaji', function (event) {
+        const {
+            idSlipGaji,
+            message,
+            text
+        } = event.detail[0];
+
+        Swal.fire({
+            title: message,
+            text: text,
+            icon: 'success',
+            showCancelButton: true,
+            cancelButtonText: 'Tidak',
+            confirmButtonText: 'Ya, Cetak Struk',
+        }).then((result) => {
+            shouldReopenDataModal = false; // modal utama akan dibuka lagi setelah ditutup
+            $("#formDataModal").modal("hide");
+            $("#reviewModal").modal("hide");
+            if (result.isConfirmed) {
+                window.open('/slip-gaji/print-nota/' + idSlipGaji, '_blank');
+            }
+        });
     });
 
 </script>

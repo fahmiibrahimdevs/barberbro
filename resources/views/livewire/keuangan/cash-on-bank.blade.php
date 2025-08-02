@@ -2,7 +2,7 @@
     <section class='section custom-section'>
         <div class='section-header'>
             <h1>Cash On Bank</h1>
-            <div class="tw-ml-auto tw-space-x-1">
+            <div class="tw-ml-auto tw-space-x-1 tw-flex">
                 <button class="btn btn-primary" wire:click.prevent='isEditingMode(false, "In")' data-toggle='modal'
                     data-backdrop='static' data-keyboard='false' data-target='#formDataModal'>Tambah Pemasukan</button>
                 <button class="btn btn-outline-danger" wire:click.prevent='isEditingMode(false, "Out")'

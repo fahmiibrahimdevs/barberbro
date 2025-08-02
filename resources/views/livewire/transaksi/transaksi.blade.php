@@ -69,7 +69,8 @@
                             </span>
                         </div>
                         <div class="tw-flex tw-justify-between tw-items-center tw-mt-2">
-                            <p class="tw-text-xs tw-font-normal tw-text-gray-500">{{ $row->tanggal }}</p>
+                            <p class="tw-text-xs tw-font-normal tw-text-gray-500">
+                                {{ \Carbon\Carbon::parse($row->tanggal)->format('d M Y, H:i:s') }}</p>
                             <div class="tw-flex tw-space-x-1">
                                 @if ($row->status == "lunas")
                                 <div

@@ -103,8 +103,9 @@ class Transaksi extends Component
                 $query->where('transaksi.id_metode_pembayaran', $this->filter_pembayaran);
             })
             ->whereBetween('transaksi.tanggal', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()])
-            ->orderBy('id', 'DESC')
-            ->orderBy('transaksi.id_cabang', 'ASC')
+            ->orderBy('transaksi.id', 'DESC')
+            ->orderBy('transaksi.no_transaksi', 'DESC')
+            ->orderBy('transaksi.tanggal', 'DESC')
             ->paginate($this->lengthData);
 
         return view('livewire.transaksi.transaksi', compact('data'));
@@ -242,12 +243,15 @@ class Transaksi extends Component
                 $this->kembalian = $this->jumlah_dibayarkan - $this->total_akhir;
                 $this->kembalian < 0 ? $status = "belum lunas" : $status = "lunas";
 
+                // $no_transaksi = $this->generateNoTransaksi($this->id_cabang);
+
                 // Ambil instance model transaksi
                 $transaksi = ModelsTransaksi::findOrFail($this->dataId);
 
                 // Update data transaksi
                 $transaksi->update([
                     'id_user'               => $this->id_user,
+                    // 'no_transaksi'          => $no_transaksi,
                     'id_pelanggan'          => $this->id_pelanggan,
                     'catatan'               => $this->catatan,
                     'total_pesanan'         => $this->total_pesanan,

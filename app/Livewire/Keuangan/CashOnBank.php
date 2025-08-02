@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Keuangan;
 
+use Carbon\Carbon;
 use Livewire\Component;
 use App\Models\Keuangan;
 use Livewire\WithPagination;
@@ -67,6 +68,7 @@ class CashOnBank extends Component
             ->where(function ($query) use ($search) {
                 $query->where('keterangan', 'LIKE', $search);
             })
+            ->whereBetween('keuangan.tanggal', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()])
             ->orderBy('id', 'DESC')
             ->paginate($this->lengthData);
 
